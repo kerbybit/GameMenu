@@ -24,6 +24,6 @@ public class CommandMenu extends CommandBase {
     @Override
     public void processCommand(ICommandSender sender, String[] args) {
         Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Opening menu"));
-        MenuGUI.openGui();
+        Main.openMenu = true;
     }
 }

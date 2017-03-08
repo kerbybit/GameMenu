@@ -16,8 +16,11 @@ public class MenuGUI extends GuiScreen {
     private static int menu = 0;
 
     public static void openGui() {
-        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Opening menu"));
-        MC.displayGuiScreen(new MenuGUI());
+        if (Main.openMenu) {
+            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Opening menu"));
+            MC.displayGuiScreen(new MenuGUI());
+            Main.openMenu = false;
+        }
     }
 
     @Override
