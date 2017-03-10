@@ -1,14 +1,14 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
+  "modid": "gm",
+  "name": "GameMenu",
+  "description": "Replace the compass on hypixel",
+  "version": "0.1",
+  "mcversion": "1.8.9",
   "url": "",
   "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
+  "authorList": ["kerbybit"],
+  "credits": "",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []

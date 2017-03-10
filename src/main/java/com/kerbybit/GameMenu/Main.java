@@ -18,6 +18,8 @@ public class Main {
         FMLCommonHandler.instance().bus().register(this);
 
         ClientCommandHandler.instance.registerCommand(new CommandMenu());
+
+        MenuGUI.init();
     }
 
     @SubscribeEvent
