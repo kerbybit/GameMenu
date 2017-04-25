@@ -8,6 +8,9 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.EnumChatFormatting;
 import org.lwjgl.opengl.GL11;
 
@@ -313,6 +316,23 @@ public class MenuGUI extends GuiScreen {
                 int drawW = 100;
                 int drawO = buttonsOffset_pvp.get(i);
                 ItemStack itemStack = new ItemStack(buttons_icons_pvp.get(i), 1);
+                if (button.equals("Crazy Walls")) {
+                    itemStack = new ItemStack(buttons_icons_pvp.get(i), 1, 3);
+                    itemStack.setTagCompound(new NBTTagCompound());
+
+                    NBTTagCompound skullOwner = new NBTTagCompound();
+                    NBTTagList textures = new NBTTagList();
+                    NBTTagCompound value = new NBTTagCompound();
+
+                    value.setTag("Value", new NBTTagString("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGFkMDQ3NmU4NjcxNjk2YWYzYTg5NDlhZmEyYTgxNGI5YmRkZTY1ZWNjZDFhOGI1OTNhZWVmZjVhMDMxOGQifX19"));
+
+                    textures.appendTag(value);
+
+                    skullOwner.setTag("Id", new NBTTagString("fd171629-3bf3-4c0f-82dc-567970aedf02"));
+                    skullOwner.setTag("Properties", textures);
+
+                    itemStack.getTagCompound().setTag("SkullOwner", skullOwner);
+                }
                 int drawY = floor(height/4)+20 + (i*17);
 
                 drawRect(drawX-(drawW/2)-3-drawO, drawY-3, drawX+(drawW/2)+3+drawO, drawY+11, 0xff00102b);
@@ -334,6 +354,11 @@ public class MenuGUI extends GuiScreen {
                 int drawW = 100;
                 int drawO = buttonsOffset_arcade.get(i);
                 ItemStack itemStack = new ItemStack(buttons_icons_arcade.get(i), 1);
+                if (button.equals("Smash Heroes")) {
+                    itemStack = new ItemStack(buttons_icons_arcade.get(i), 1, 3);
+                    itemStack.setTagCompound(new NBTTagCompound());
+                    itemStack.getTagCompound().setTag("SkullOwner", new NBTTagString("SpiderMan"));
+                }
                 int drawY = floor(height/4)+20 + (i*17);
 
                 drawRect(drawX-(drawW/2)-3-drawO, drawY-3, drawX+(drawW/2)+3+drawO, drawY+11, 0xff001c03);
