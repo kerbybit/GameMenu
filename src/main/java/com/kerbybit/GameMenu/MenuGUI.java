@@ -317,8 +317,8 @@ public class MenuGUI extends GuiScreen {
                 int drawO = buttonsOffset_pvp.get(i);
                 ItemStack itemStack = new ItemStack(buttons_icons_pvp.get(i), 1);
                 if (button.equals("Crazy Walls")) {
-                    itemStack = new ItemStack(buttons_icons_pvp.get(i), 1, 3);
-                    itemStack.setTagCompound(new NBTTagCompound());
+                    itemStack = new ItemStack(buttons_icons_pvp.get(i), 1, 2);
+                    /*itemStack.setTagCompound(new NBTTagCompound());
 
                     NBTTagCompound skullOwner = new NBTTagCompound();
                     NBTTagList textures = new NBTTagList();
@@ -331,7 +331,7 @@ public class MenuGUI extends GuiScreen {
                     skullOwner.setTag("Id", new NBTTagString("fd171629-3bf3-4c0f-82dc-567970aedf02"));
                     skullOwner.setTag("Properties", textures);
 
-                    itemStack.getTagCompound().setTag("SkullOwner", skullOwner);
+                    itemStack.getTagCompound().setTag("SkullOwner", skullOwner);*/
                 }
                 int drawY = floor(height/4)+20 + (i*17);
 
