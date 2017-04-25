@@ -6,6 +6,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -27,7 +28,9 @@ public class Main {
 
         ClientCommandHandler.instance.registerCommand(new CommandMenu());
 
-        openMenuKey = new KeyBinding("Open Hypixel game menu", Keyboard.KEY_G, "Multiplayer");
+        openMenuKey = new KeyBinding("Open Hypixel game menu", Keyboard.KEY_G, "GameMenu");
+
+        ClientRegistry.registerKeyBinding(openMenuKey);
 
         MenuGUI.init();
     }
