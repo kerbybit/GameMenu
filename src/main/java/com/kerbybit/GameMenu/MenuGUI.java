@@ -1,5 +1,9 @@
 package com.kerbybit.GameMenu;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
@@ -9,7 +13,6 @@ import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.EnumChatFormatting;
 import org.lwjgl.opengl.GL11;
@@ -29,87 +32,127 @@ public class MenuGUI extends GuiScreen {
     private static int buttonOffset_pvp = 0;
     private static int buttonOffset_arcade = 0;
 
-    private static String buttonText_pvp = EnumChatFormatting.BLUE + "PvP Minigames";
-    private static int buttonTextOffset_pvp = 0;
-    private static int buttonUnderlineOffset_pvp = 0;
-    private static String buttonText_arcade = EnumChatFormatting.DARK_GREEN + "Arcade Minigames";
-    private static int buttonTextOffset_arcade = 0;
-    private static int buttonUnderlineOffset_arcade = 0;
+    private static String text_left;
+    private static int offset_left = 0;
+    private static int underline_left = 0;
+    
+    private static String text_right;
+    private static int offset_right = 0;
+    private static int underline_right = 0;
 
-    private static List<String> buttons_names_pvp = new ArrayList<String>();
-    private static List<String> buttons_commands_pvp = new ArrayList<String>();
-    private static List<Integer> buttonsOffset_pvp = new ArrayList<Integer>();
-    private static List<Item> buttons_icons_pvp = new ArrayList<Item>();
-    private static List<String> buttons_names_arcade = new ArrayList<String>();
-    private static List<String> buttons_commands_arcade = new ArrayList<String>();
-    private static List<Integer> buttonsOffset_arcade = new ArrayList<Integer>();
-    private static List<Item> buttons_icons_arcade = new ArrayList<Item>();
+    private static List<String> left_texts = new ArrayList<String>();
+    private static List<String> left_commands = new ArrayList<String>();
+    private static List<Integer> left_offsets = new ArrayList<Integer>();
+    private static List<Item> left_icons = new ArrayList<Item>();
+    private static List<String> left_icons_extra = new ArrayList<String>();
+    
+    
+    private static List<String> right_texts = new ArrayList<String>();
+    private static List<String> right_commands = new ArrayList<String>();
+    private static List<Integer> right_offsets = new ArrayList<Integer>();
+    private static List<Item> right_icons = new ArrayList<Item>();
+    private static List<String> right_icons_extra = new ArrayList<String>();
 
-    private static String buttonText_exit = EnumChatFormatting.RED + "Exit";
-    private static int buttonOffset_exit = -5;
+    private static String text_bottom;
+    private static int offset_bottom = -5;
+    private static String command_bottom;
+    private static float color_left = 0xff00102b;
 
-    private static String buttonText_classic = EnumChatFormatting.GOLD + "Hypixel Classics";
-    private static int buttonOffset_classic = 5;
+    private static String text_top;
+    private static int offset_top = 5;
+    private static String command_top;
+    private static float color_right = 0xff001c03;
 
     static void init() {
+        left_texts.clear();
+        left_commands.clear();
+        left_offsets.clear();
+        left_icons.clear();
+        right_texts.clear();
+        right_commands.clear();
+        right_offsets.clear();
+        right_icons.clear();
 
-        buttons_names_pvp.add("Blitz");
-        buttons_commands_pvp.add("blitz");
-        buttonsOffset_pvp.add(0);
-        buttons_icons_pvp.add(Item.getByNameOrId("diamond_sword"));
-        buttons_names_pvp.add("SkyWars");
-        buttons_commands_pvp.add("skywars");
-        buttonsOffset_pvp.add(0);
-        buttons_icons_pvp.add(Item.getByNameOrId("ender_eye"));
-        buttons_names_pvp.add("SkyClash");
-        buttons_commands_pvp.add("skyclash");
-        buttonsOffset_pvp.add(0);
-        buttons_icons_pvp.add(Item.getByNameOrId("fire_charge"));
-        buttons_names_pvp.add("Mega Walls");
-        buttons_commands_pvp.add("mw");
-        buttonsOffset_pvp.add(0);
-        buttons_icons_pvp.add(Item.getByNameOrId("soul_sand"));
-        buttons_names_pvp.add("Crazy Walls");
-        buttons_commands_pvp.add("crazywalls");
-        buttonsOffset_pvp.add(0);
-        buttons_icons_pvp.add(Item.getByNameOrId("skull"));
-        buttons_names_pvp.add("UHC Champions");
-        buttons_commands_pvp.add("uhc");
-        buttonsOffset_pvp.add(0);
-        buttons_icons_pvp.add(Item.getByNameOrId("golden_apple"));
-        buttons_names_pvp.add("Speed UHC");
-        buttons_commands_pvp.add("speeduhc");
-        buttonsOffset_pvp.add(0);
-        buttons_icons_pvp.add(Item.getByNameOrId("golden_carrot"));
+        JsonObject menuJson = new JsonObject();
 
-        buttons_names_arcade.add("Arcade Games");
-        buttons_commands_arcade.add("arcade");
-        buttonsOffset_arcade.add(0);
-        buttons_icons_arcade.add(Item.getByNameOrId("slime_ball"));
-        buttons_names_arcade.add("Housing");
-        buttons_commands_arcade.add("main");
-        buttonsOffset_arcade.add(0);
-        buttons_icons_arcade.add(Item.getByNameOrId("dark_oak_door"));
-        buttons_names_arcade.add("Smash Heroes");
-        buttons_commands_arcade.add("smash");
-        buttonsOffset_arcade.add(0);
-        buttons_icons_arcade.add(Item.getByNameOrId("skull"));
-        buttons_names_arcade.add("TnT Games");
-        buttons_commands_arcade.add("tnt");
-        buttonsOffset_arcade.add(0);
-        buttons_icons_arcade.add(Item.getByNameOrId("tnt"));
-        buttons_names_arcade.add("Warlords");
-        buttons_commands_arcade.add("warlords");
-        buttonsOffset_arcade.add(0);
-        buttons_icons_arcade.add(Item.getByNameOrId("stone_axe"));
-        buttons_names_arcade.add("Cops v Crims");
-        buttons_commands_arcade.add("cvc");
-        buttonsOffset_arcade.add(0);
-        buttons_icons_arcade.add(Item.getByNameOrId("iron_bars"));
-        buttons_names_arcade.add("Prototype");
-        buttons_commands_arcade.add("ptl");
-        buttonsOffset_arcade.add(0);
-        buttons_icons_arcade.add(Item.getByNameOrId("anvil"));
+        FileHandler.checkDir();
+        try {
+            menuJson = FileHandler.loadFile("menu.json");
+        } catch (IOException e) {
+            try {
+                FileHandler.generateFile();
+                menuJson = FileHandler.loadFile("menu.json");
+            } catch (IOException exception) {
+                e.printStackTrace();
+                CommandMenu.showMessage(EnumChatFormatting.RED + "Unable to load menu.json! IOException");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            CommandMenu.showMessage(EnumChatFormatting.RED + "Unable to load menu.json! Unknown Exception");
+        }
+
+        if ((text_bottom = addFormatting(FileHandler.getValue(menuJson, "bottom.name"))).equals("null")) {
+            text_bottom = EnumChatFormatting.RED + "Exit";
+        }
+        if ((command_bottom = FileHandler.getValue(menuJson, "bottom.command")).equals("null")) {
+            command_bottom = "*exit*";
+        }
+
+        if ((text_top = addFormatting(FileHandler.getValue(menuJson, "top.name"))).equals("null")) {
+            text_top = EnumChatFormatting.GOLD + "Hypixel Classics";
+        }
+        if ((command_top = FileHandler.getValue(menuJson, "top.command")).equals("null")) {
+            command_top = "classic";
+        }
+
+        if ((text_left = addFormatting(FileHandler.getValue(menuJson, "left.name"))).equals("null")) {
+            text_left = EnumChatFormatting.BLUE + "PvP Minigames";
+        }
+        if ((text_right = addFormatting(FileHandler.getValue(menuJson, "right.name"))).equals("null")) {
+            text_right = EnumChatFormatting.DARK_GREEN + "Arcade Minigames";
+        }
+
+        JsonArray leftButtons = new JsonParser().parse(FileHandler.getValue(menuJson, "left.buttons")).getAsJsonArray();
+        for (JsonElement leftButton : leftButtons) {
+            left_texts.add(FileHandler.getValue(leftButton.getAsJsonObject(), "name"));
+            left_commands.add(FileHandler.getValue(leftButton.getAsJsonObject(), "command"));
+            left_offsets.add(0);
+            left_icons.add(Item.getByNameOrId(FileHandler.getValue(leftButton.getAsJsonObject(), "icon.item")));
+
+            String extra = "";
+
+            if (!FileHandler.getValue(leftButton.getAsJsonObject(), "icon.meta").equals("null")) {
+                extra += "meta="+FileHandler.getValue(leftButton.getAsJsonObject(), "icon.meta");
+            }
+            extra += ",";
+            if (!FileHandler.getValue(leftButton.getAsJsonObject(), "icon.owner").equals("null")) {
+                extra += "owner="+FileHandler.getValue(leftButton.getAsJsonObject(), "icon.owner");
+            }
+
+            if (extra.equals(",")) {extra = "";}
+            left_icons_extra.add(extra);
+        }
+
+        JsonArray rightButtons = new JsonParser().parse(FileHandler.getValue(menuJson, "right.buttons")).getAsJsonArray();
+        for (JsonElement rightButton : rightButtons) {
+            right_texts.add(FileHandler.getValue(rightButton.getAsJsonObject(), "name"));
+            right_commands.add(FileHandler.getValue(rightButton.getAsJsonObject(), "command"));
+            right_offsets.add(0);
+            right_icons.add(Item.getByNameOrId(FileHandler.getValue(rightButton.getAsJsonObject(), "icon.item")));
+
+            String extra = "";
+
+            if (!FileHandler.getValue(rightButton.getAsJsonObject(), "icon.meta").equals("null")) {
+                extra += "meta="+FileHandler.getValue(rightButton.getAsJsonObject(), "icon.meta");
+            }
+            extra += ",";
+            if (!FileHandler.getValue(rightButton.getAsJsonObject(), "icon.owner").equals("null")) {
+                extra += "owner="+FileHandler.getValue(rightButton.getAsJsonObject(), "icon.owner");
+            }
+
+            if (extra.equals(",")) {extra = "";}
+            right_icons_extra.add(extra);
+        }
     }
 
     static void openGui() {
@@ -120,34 +163,43 @@ public class MenuGUI extends GuiScreen {
         }
     }
 
+    private void executeCommand(String command) {
+        if (command.equalsIgnoreCase("*exit*")) {
+            menu = 1;
+        } else if (command.equalsIgnoreCase("home")) {
+            MC.thePlayer.closeScreen();
+            MC.thePlayer.sendChatMessage("/home");
+        } else if (!command.equalsIgnoreCase("null")) {
+            MC.thePlayer.closeScreen();
+            MC.thePlayer.sendChatMessage("/lobby " + command);
+        }
+    }
+
     @Override
     public void mouseClicked(int x, int y, int button) throws IOException {
         if (button==0) {
             if (menu == 0) {
                 if (y > height - (height/7)) {
-                    menu = 1;
+                    executeCommand(command_bottom);
                 } else if (y < height/7) {
-                    MC.thePlayer.closeScreen();
-                    MC.thePlayer.sendChatMessage("/lobby classic");
+                    executeCommand(command_top);
                 } else {
                     if (x < (width / 2) - 5) {
-                        if (x > buttonTextOffset_pvp-100 && x < buttonTextOffset_pvp+100) {
+                        if (x > offset_left-100 && x < offset_left+100) {
                             int i = 0;
-                            for (String value : buttons_commands_pvp) {
+                            for (String value : left_commands) {
                                 if (y > floor(height/4)+ 17 + (i*17) && y < floor(height/4)+ 31 + (i*17)) {
-                                    MC.thePlayer.closeScreen();
-                                    MC.thePlayer.sendChatMessage("/lobby " + value);
+                                    executeCommand(value);
                                 }
                                 i++;
                             }
                         }
                     } else if (x > (width/2)+5) {
-                        if (x > buttonTextOffset_arcade-100 && x < buttonTextOffset_arcade+100) {
+                        if (x > offset_right-100 && x < offset_right+100) {
                             int i = 0;
-                            for (String value : buttons_commands_arcade) {
+                            for (String value : right_commands) {
                                 if (y > floor(height / 4) + 17 + (i * 17) && y < floor(height / 4) + 31 + (i * 17)) {
-                                    MC.thePlayer.closeScreen();
-                                    MC.thePlayer.sendChatMessage("/lobby " + value);
+                                    executeCommand(value);
                                 }
                                 i++;
                             }
@@ -164,107 +216,107 @@ public class MenuGUI extends GuiScreen {
         if (menu == 0 || menu == -1) {
             if (y > height - (height/7)) {
                 buttonOffset_pvp = floor(Animation.interp(buttonOffset_pvp, -100, 5, 1));
-                buttonTextOffset_pvp = floor(Animation.interp(buttonTextOffset_pvp, width/4, 5, 1));
-                buttonUnderlineOffset_pvp = floor(Animation.interp(buttonUnderlineOffset_pvp, 0, 5, 1));
+                offset_left = floor(Animation.interp(offset_left, width/4, 5, 1));
+                underline_left = floor(Animation.interp(underline_left, 0, 5, 1));
                 buttonOffset_arcade = floor(Animation.interp(buttonOffset_arcade, -100, 5, 1));
-                buttonTextOffset_arcade = floor(Animation.interp(buttonTextOffset_arcade, width - width/4, 5, 1));
-                buttonUnderlineOffset_arcade = floor(Animation.interp(buttonUnderlineOffset_arcade, 0, 5, 1));
-                for (int i=0; i<buttons_names_arcade.size(); i++) {
-                    buttonsOffset_arcade.set(i, floor(Animation.interp(buttonsOffset_arcade.get(i), 0, 5, 1)));
+                offset_right = floor(Animation.interp(offset_right, width - width/4, 5, 1));
+                underline_right = floor(Animation.interp(underline_right, 0, 5, 1));
+                for (int i=0; i<right_texts.size(); i++) {
+                    right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, 5, 1)));
                 }
-                for (int i=0; i<buttons_names_pvp.size(); i++) {
-                    buttonsOffset_pvp.set(i, floor(Animation.interp(buttonsOffset_pvp.get(i), 0, 5, 1)));
+                for (int i=0; i<left_texts.size(); i++) {
+                    left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, 5, 1)));
                 }
-                buttonOffset_exit = floor(Animation.interp(buttonOffset_exit,  -height/7, 5, 1));
-                buttonOffset_classic = floor(Animation.interp(buttonOffset_classic, 5, 5, 1));
+                offset_bottom = floor(Animation.interp(offset_bottom,  -height/7, 5, 1));
+                offset_top = floor(Animation.interp(offset_top, 5, 5, 1));
             } else if (y < height/7) {
                 buttonOffset_pvp = floor(Animation.interp(buttonOffset_pvp, -100, 5, 1));
-                buttonTextOffset_pvp = floor(Animation.interp(buttonTextOffset_pvp, width/4, 5, 1));
-                buttonUnderlineOffset_pvp = floor(Animation.interp(buttonUnderlineOffset_pvp, 0, 5, 1));
+                offset_left = floor(Animation.interp(offset_left, width/4, 5, 1));
+                underline_left = floor(Animation.interp(underline_left, 0, 5, 1));
                 buttonOffset_arcade = floor(Animation.interp(buttonOffset_arcade, -100, 5, 1));
-                buttonTextOffset_arcade = floor(Animation.interp(buttonTextOffset_arcade, width - width/4, 5, 1));
-                buttonUnderlineOffset_arcade = floor(Animation.interp(buttonUnderlineOffset_arcade, 0, 5, 1));
-                for (int i=0; i<buttons_names_arcade.size(); i++) {
-                    buttonsOffset_arcade.set(i, floor(Animation.interp(buttonsOffset_arcade.get(i), 0, 5, 1)));
+                offset_right = floor(Animation.interp(offset_right, width - width/4, 5, 1));
+                underline_right = floor(Animation.interp(underline_right, 0, 5, 1));
+                for (int i=0; i<right_texts.size(); i++) {
+                    right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, 5, 1)));
                 }
-                for (int i=0; i<buttons_names_pvp.size(); i++) {
-                    buttonsOffset_pvp.set(i, floor(Animation.interp(buttonsOffset_pvp.get(i), 0, 5, 1)));
+                for (int i=0; i<left_texts.size(); i++) {
+                    left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, 5, 1)));
                 }
-                buttonOffset_exit = floor(Animation.interp(buttonOffset_exit,  0, 5, 1));
-                buttonOffset_classic = floor(Animation.interp(buttonOffset_classic, height/7, 5, 1));
+                offset_bottom = floor(Animation.interp(offset_bottom,  0, 5, 1));
+                offset_top = floor(Animation.interp(offset_top, height/7, 5, 1));
             } else {
-                buttonOffset_classic = floor(Animation.interp(buttonOffset_classic, 5, 5, 1));
-                buttonOffset_exit = floor(Animation.interp(buttonOffset_exit, 0, 5, 1));
+                offset_top = floor(Animation.interp(offset_top, 5, 5, 1));
+                offset_bottom = floor(Animation.interp(offset_bottom, 0, 5, 1));
                 if (x < width/2) {
-                    for (int i=0; i<buttons_names_arcade.size(); i++) {
-                        buttonsOffset_arcade.set(i, floor(Animation.interp(buttonsOffset_arcade.get(i), 0, 5, 1)));
+                    for (int i=0; i<right_texts.size(); i++) {
+                        right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, 5, 1)));
                     }
                     buttonOffset_pvp = floor(Animation.interp(buttonOffset_pvp, 50, 5, 1));
-                    buttonTextOffset_pvp = floor(Animation.interp(buttonTextOffset_pvp, width/3, 5, 1));
-                    buttonUnderlineOffset_pvp = floor(Animation.interp(buttonUnderlineOffset_pvp, ren.getStringWidth(buttonText_pvp)/2, 5, 1));
+                    offset_left = floor(Animation.interp(offset_left, width/3, 5, 1));
+                    underline_left = floor(Animation.interp(underline_left, ren.getStringWidth(text_left)/2, 5, 1));
                     buttonOffset_arcade = floor(Animation.interp(buttonOffset_arcade, -40, 5, 1));
-                    buttonTextOffset_arcade = floor(Animation.interp(buttonTextOffset_arcade, width - width/4, 5, 1));
-                    buttonUnderlineOffset_arcade = floor(Animation.interp(buttonUnderlineOffset_arcade, 0, 5, 1));
+                    offset_right = floor(Animation.interp(offset_right, width - width/4, 5, 1));
+                    underline_right = floor(Animation.interp(underline_right, 0, 5, 1));
 
-                    if (x > buttonTextOffset_pvp-100 && x < buttonTextOffset_pvp+100) {
-                        for (int i=0; i<buttons_names_pvp.size(); i++) {
+                    if (x > offset_left-100 && x < offset_left+100) {
+                        for (int i=0; i<left_texts.size(); i++) {
                             if (y > floor(height/4)+ 17 + (i*17) && y < floor(height/4)+ 31 + (i*17)) {
-                                buttonsOffset_pvp.set(i, floor(Animation.interp(buttonsOffset_pvp.get(i), 25, 5, 1)));
+                                left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 25, 5, 1)));
                             } else {
-                                buttonsOffset_pvp.set(i, floor(Animation.interp(buttonsOffset_pvp.get(i), 0, 5, 1)));
+                                left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, 5, 1)));
                             }
                         }
                     } else {
-                        for (int i=0; i<buttons_names_pvp.size(); i++) {
-                            buttonsOffset_pvp.set(i, floor(Animation.interp(buttonsOffset_pvp.get(i), 0, 5, 1)));
+                        for (int i=0; i<left_texts.size(); i++) {
+                            left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, 5, 1)));
                         }
                     }
                 } else {
-                    for (int i=0; i<buttons_names_pvp.size(); i++) {
-                        buttonsOffset_pvp.set(i, floor(Animation.interp(buttonsOffset_pvp.get(i), 0, 5, 1)));
+                    for (int i=0; i<left_texts.size(); i++) {
+                        left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, 5, 1)));
                     }
                     buttonOffset_pvp = floor(Animation.interp(buttonOffset_pvp, -40, 5, 1));
-                    buttonTextOffset_pvp = floor(Animation.interp(buttonTextOffset_pvp, width/4, 5, 1));
-                    buttonUnderlineOffset_pvp = floor(Animation.interp(buttonUnderlineOffset_pvp, 0, 5, 1));
+                    offset_left = floor(Animation.interp(offset_left, width/4, 5, 1));
+                    underline_left = floor(Animation.interp(underline_left, 0, 5, 1));
                     buttonOffset_arcade = floor(Animation.interp(buttonOffset_arcade, 50, 5, 1));
-                    buttonTextOffset_arcade = floor(Animation.interp(buttonTextOffset_arcade, width - width/3, 5, 1));
-                    buttonUnderlineOffset_arcade = floor(Animation.interp(buttonUnderlineOffset_arcade, ren.getStringWidth(buttonText_arcade)/2, 5, 1));
+                    offset_right = floor(Animation.interp(offset_right, width - width/3, 5, 1));
+                    underline_right = floor(Animation.interp(underline_right, ren.getStringWidth(text_right)/2, 5, 1));
 
-                    if (x > buttonTextOffset_arcade-100 && x < buttonTextOffset_arcade+100) {
-                        for (int i=0; i<buttons_names_arcade.size(); i++) {
+                    if (x > offset_right-100 && x < offset_right+100) {
+                        for (int i=0; i<right_texts.size(); i++) {
                             if (y > floor(height/4)+ 17 + (i*17) && y < floor(height/4)+ 31 + (i*17)) {
-                                buttonsOffset_arcade.set(i, floor(Animation.interp(buttonsOffset_arcade.get(i), 25, 5, 1)));
+                                right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 25, 5, 1)));
                             } else {
-                                buttonsOffset_arcade.set(i, floor(Animation.interp(buttonsOffset_arcade.get(i), 0, 5, 1)));
+                                right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, 5, 1)));
                             }
                         }
                     } else {
-                        for (int i=0; i<buttons_names_arcade.size(); i++) {
-                            buttonsOffset_arcade.set(i, floor(Animation.interp(buttonsOffset_arcade.get(i), 0, 5, 1)));
+                        for (int i=0; i<right_texts.size(); i++) {
+                            right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, 5, 1)));
                         }
                     }
                 }
             }
         } else {
             buttonOffset_pvp = floor(Animation.interp(buttonOffset_pvp, -width/2-20, 10, 1));
-            buttonTextOffset_pvp = floor(Animation.interp(buttonTextOffset_pvp, -width/2-20 + width/4, 10, 1));
-            buttonUnderlineOffset_pvp = floor(Animation.interp(buttonUnderlineOffset_pvp, 0, 5, 1));
+            offset_left = floor(Animation.interp(offset_left, -width/2-20 + width/4, 10, 1));
+            underline_left = floor(Animation.interp(underline_left, 0, 5, 1));
 
             buttonOffset_arcade = floor(Animation.interp(buttonOffset_arcade, -width/2-20, 10, 1));
-            buttonTextOffset_arcade = floor(Animation.interp(buttonTextOffset_arcade, width/2+20 + width - width/4, 10, 1));
-            buttonUnderlineOffset_arcade = floor(Animation.interp(buttonUnderlineOffset_arcade, 0, 6, 1));
+            offset_right = floor(Animation.interp(offset_right, width/2+20 + width - width/4, 10, 1));
+            underline_right = floor(Animation.interp(underline_right, 0, 6, 1));
 
-            for (int i=0; i<buttons_names_arcade.size(); i++) {
-                buttonsOffset_arcade.set(i, floor(Animation.interp(buttonsOffset_arcade.get(i), 0, 5, 1)));
+            for (int i=0; i<right_texts.size(); i++) {
+                right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, 5, 1)));
             }
-            for (int i=0; i<buttons_names_pvp.size(); i++) {
-                buttonsOffset_pvp.set(i, floor(Animation.interp(buttonsOffset_pvp.get(i), 0, 5, 1)));
+            for (int i=0; i<left_texts.size(); i++) {
+                left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, 5, 1)));
             }
 
-            buttonOffset_exit = floor(Animation.interp(buttonOffset_exit,  21, 10, 1));
-            buttonOffset_classic = floor(Animation.interp(buttonOffset_classic, -1, 10, 1));
+            offset_bottom = floor(Animation.interp(offset_bottom,  21, 10, 1));
+            offset_top = floor(Animation.interp(offset_top, -1, 10, 1));
 
-            if (buttonOffset_exit == 12) {
+            if (offset_bottom == 12) {
                 MC.thePlayer.closeScreen();
             }
         }
@@ -286,56 +338,59 @@ public class MenuGUI extends GuiScreen {
 
 
         if (menu == -1) {
-            buttonTextOffset_pvp = floor(-width/2-20);
-            buttonTextOffset_arcade = floor(width/2+20 + width - width/4);
+            offset_left = floor(-width/2-20);
+            offset_right = floor(width/2+20 + width - width/4);
             buttonOffset_pvp = floor(-width/2-20);
             buttonOffset_arcade = floor(-width/2-20);
-            buttonUnderlineOffset_pvp = 0;
-            buttonUnderlineOffset_arcade = 0;
-            for (int i=0; i<buttonsOffset_pvp.size(); i++) {
-                buttonsOffset_pvp.set(i, 0);
+            underline_left = 0;
+            underline_right = 0;
+            for (int i=0; i<left_offsets.size(); i++) {
+                left_offsets.set(i, 0);
             }
-            for (int i=0; i<buttonsOffset_arcade.size(); i++) {
-                buttonsOffset_arcade.set(i, 0);
+            for (int i=0; i<right_offsets.size(); i++) {
+                right_offsets.set(i, 0);
             }
-            buttonOffset_exit = -5;
-            buttonOffset_classic = 5;
+            offset_bottom = -5;
+            offset_top = 5;
             menu = 0;
         }
 
         if (menu == 0 || menu == 1) {
             drawRect(0, 0, floor(width/2) - 5 + buttonOffset_pvp, floor(height), 0x50000000);
-            drawCenteredString(ren, buttonText_pvp, buttonTextOffset_pvp, floor(height/4), 0xffffffff);
-            if (buttonUnderlineOffset_pvp > 0) {
-                drawHorizontalLine(buttonTextOffset_pvp - buttonUnderlineOffset_pvp, buttonTextOffset_pvp + buttonUnderlineOffset_pvp, floor(height/4)+10, 0xffffffff);
+            drawCenteredString(ren, text_left, offset_left, floor(height/4), 0xffffffff);
+            if (underline_left > 0) {
+                drawHorizontalLine(offset_left - underline_left, offset_left + underline_left, floor(height/4)+10, 0xffffffff);
             }
 
             int i = 0;
-            for (String button : buttons_names_pvp) {
-                int drawX = buttonTextOffset_pvp;
+            for (String button : left_texts) {
+                int drawX = offset_left;
                 int drawW = 100;
-                int drawO = buttonsOffset_pvp.get(i);
-                ItemStack itemStack = new ItemStack(buttons_icons_pvp.get(i), 1);
-                if (button.equals("Crazy Walls")) {
-                    itemStack = new ItemStack(buttons_icons_pvp.get(i), 1, 2);
-                    /*itemStack.setTagCompound(new NBTTagCompound());
+                int drawO = left_offsets.get(i);
 
-                    NBTTagCompound skullOwner = new NBTTagCompound();
-                    NBTTagList textures = new NBTTagList();
-                    NBTTagCompound value = new NBTTagCompound();
-
-                    value.setTag("Value", new NBTTagString("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGFkMDQ3NmU4NjcxNjk2YWYzYTg5NDlhZmEyYTgxNGI5YmRkZTY1ZWNjZDFhOGI1OTNhZWVmZjVhMDMxOGQifX19"));
-
-                    textures.appendTag(value);
-
-                    skullOwner.setTag("Id", new NBTTagString("fd171629-3bf3-4c0f-82dc-567970aedf02"));
-                    skullOwner.setTag("Properties", textures);
-
-                    itemStack.getTagCompound().setTag("SkullOwner", skullOwner);*/
+                int meta = 0;
+                String owner = "";
+                String extra = left_icons_extra.get(i);
+                for (String value : extra.split(",")) {
+                    if (value.startsWith("meta=")) {
+                        try {
+                            meta = Integer.parseInt(value.substring(5));
+                        } catch (NumberFormatException e) {
+                            meta = 0;
+                        }
+                    } else if (value.startsWith("owner=")) {
+                        owner = value.substring(6);
+                    }
                 }
+                ItemStack itemStack = new ItemStack(left_icons.get(i), 1, meta);
+                if (!owner.equals("")) {
+                    itemStack.setTagCompound(new NBTTagCompound());
+                    itemStack.getTagCompound().setTag("SkullOwner", new NBTTagString(owner));
+                }
+
                 int drawY = floor(height/4)+20 + (i*17);
 
-                drawRect(drawX-(drawW/2)-3-drawO, drawY-3, drawX+(drawW/2)+3+drawO, drawY+11, 0xff00102b);
+                drawRect(drawX-(drawW/2)-3-drawO, drawY-3, drawX+(drawW/2)+3+drawO, drawY+11, (int) color_left);
                 drawCenteredString(ren, button, drawX, drawY, 0xffffffff);
                 drawItemIcon(drawX-(drawW/2)-3-(drawO/2), drawY-4, itemStack);
                 drawItemIcon(drawX+(drawW/2)-13+(drawO/2), drawY-4, itemStack);
@@ -343,36 +398,51 @@ public class MenuGUI extends GuiScreen {
             }
 
             drawRect(floor(width/2) + 5 - buttonOffset_arcade, 0, floor(width), floor(height), 0x50000000);
-            drawCenteredString(ren, buttonText_arcade, buttonTextOffset_arcade, floor(height/4), 0xffffffff);
-            if (buttonUnderlineOffset_arcade > 0) {
-                drawHorizontalLine(buttonTextOffset_arcade - buttonUnderlineOffset_arcade, buttonTextOffset_arcade + buttonUnderlineOffset_arcade, floor(height/4)+10, 0xffffffff);
+            drawCenteredString(ren, text_right, offset_right, floor(height/4), 0xffffffff);
+            if (underline_right > 0) {
+                drawHorizontalLine(offset_right - underline_right, offset_right + underline_right, floor(height/4)+10, 0xffffffff);
             }
 
             i = 0;
-            for (String button : buttons_names_arcade) {
-                int drawX = buttonTextOffset_arcade;
+            for (String button : right_texts) {
+                int drawX = offset_right;
                 int drawW = 100;
-                int drawO = buttonsOffset_arcade.get(i);
-                ItemStack itemStack = new ItemStack(buttons_icons_arcade.get(i), 1);
-                if (button.equals("Smash Heroes")) {
-                    itemStack = new ItemStack(buttons_icons_arcade.get(i), 1, 3);
-                    itemStack.setTagCompound(new NBTTagCompound());
-                    itemStack.getTagCompound().setTag("SkullOwner", new NBTTagString("SpiderMan"));
+                int drawO = right_offsets.get(i);
+
+                int meta = 0;
+                String owner = "";
+                String extra = right_icons_extra.get(i);
+                for (String value : extra.split(",")) {
+                    if (value.startsWith("meta=")) {
+                        try {
+                            meta = Integer.parseInt(value.substring(5));
+                        } catch (NumberFormatException e) {
+                            meta = 0;
+                        }
+                    } else if (value.startsWith("owner=")) {
+                        owner = value.substring(6);
+                    }
                 }
+                ItemStack itemStack = new ItemStack(right_icons.get(i), 1, meta);
+                if (!owner.equals("")) {
+                    itemStack.setTagCompound(new NBTTagCompound());
+                    itemStack.getTagCompound().setTag("SkullOwner", new NBTTagString(owner));
+                }
+
                 int drawY = floor(height/4)+20 + (i*17);
 
-                drawRect(drawX-(drawW/2)-3-drawO, drawY-3, drawX+(drawW/2)+3+drawO, drawY+11, 0xff001c03);
+                drawRect(drawX-(drawW/2)-3-drawO, drawY-3, drawX+(drawW/2)+3+drawO, drawY+11, (int) color_right);
                 drawCenteredString(ren, button, drawX, drawY, 0xffffffff);
                 drawItemIcon(drawX-(drawW/2)-3-(drawO/2), drawY-4, itemStack);
                 drawItemIcon(drawX+(drawW/2)-13+(drawO/2), drawY-4, itemStack);
                 i++;
             }
 
-            drawRect(0, floor(height + buttonOffset_exit), floor(width), floor(height), 0xff000000);
-            drawCenteredString(ren, buttonText_exit, floor(width / 2), floor(height + buttonOffset_exit/2), 0xffffffff);
+            drawRect(0, floor(height + offset_bottom), floor(width), floor(height), 0xff000000);
+            drawCenteredString(ren, text_bottom, floor(width / 2), floor(height + offset_bottom/2), 0xffffffff);
 
-            drawRect(0, floor(buttonOffset_classic), floor(width), 0, 0xff000000);
-            drawCenteredString(ren, buttonText_classic, floor(width/2), floor(buttonOffset_classic/2 - 10), 0xffffffff);
+            drawRect(0, floor(offset_top), floor(width), 0, 0xff000000);
+            drawCenteredString(ren, text_top, floor(width/2), floor(offset_top/2 - 10), 0xffffffff);
         }
 
         super.drawScreen(x, y, ticks);
@@ -387,5 +457,30 @@ public class MenuGUI extends GuiScreen {
         itemRenderer.zLevel = 200.0F;
 
         itemRenderer.renderItemIntoGUI(itemStack, x, y);
+    }
+
+    private static String addFormatting(String in) {
+        return in.replace("&0", EnumChatFormatting.BLACK.toString())
+                .replace("&1", EnumChatFormatting.DARK_BLUE.toString())
+                .replace("&2", EnumChatFormatting.DARK_GREEN.toString())
+                .replace("&3", EnumChatFormatting.DARK_AQUA.toString())
+                .replace("&4", EnumChatFormatting.DARK_RED.toString())
+                .replace("&5", EnumChatFormatting.DARK_PURPLE.toString())
+                .replace("&6", EnumChatFormatting.GOLD.toString())
+                .replace("&7", EnumChatFormatting.GRAY.toString())
+                .replace("&8", EnumChatFormatting.DARK_GRAY.toString())
+                .replace("&9", EnumChatFormatting.BLUE.toString())
+                .replace("&a", EnumChatFormatting.GREEN.toString())
+                .replace("&b", EnumChatFormatting.AQUA.toString())
+                .replace("&c", EnumChatFormatting.RED.toString())
+                .replace("&d", EnumChatFormatting.LIGHT_PURPLE.toString())
+                .replace("&e", EnumChatFormatting.YELLOW.toString())
+                .replace("&f", EnumChatFormatting.WHITE.toString())
+                .replace("&k", EnumChatFormatting.OBFUSCATED.toString())
+                .replace("&l", EnumChatFormatting.BOLD.toString())
+                .replace("&m", EnumChatFormatting.STRIKETHROUGH.toString())
+                .replace("&n", EnumChatFormatting.UNDERLINE.toString())
+                .replace("&o", EnumChatFormatting.ITALIC.toString())
+                .replace("&r", EnumChatFormatting.RESET.toString());
     }
 }

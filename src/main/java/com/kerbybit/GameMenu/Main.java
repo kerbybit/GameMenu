@@ -6,6 +6,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
@@ -14,12 +15,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 
-@Mod(modid = "gm", name = "GameMenu", version = "0.1")
+@Mod(modid = "gm", name = "GameMenu", version = "0.7")
 public class Main {
     static Boolean openMenu = false;
+    static String dir = "./mods/GameMenu/";
     private KeyBinding openMenuKey;
     private Minecraft mc = Minecraft.getMinecraft();
     private EntityPlayerSP player = mc.thePlayer;
+    static Boolean worldLoaded = false;
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
@@ -45,5 +48,11 @@ public class Main {
     @SubscribeEvent
     public void render(RenderGameOverlayEvent event) {
         MenuGUI.openGui();
+        worldLoaded = true;
+    }
+
+    @SubscribeEvent
+    public void worldUnload(WorldEvent.Unload event) {
+        worldLoaded = false;
     }
 }
