@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 import static net.minecraft.realms.RealmsMth.floor;
 
@@ -29,8 +30,8 @@ public class MenuGUI extends GuiScreen {
 
     private static int menu = 0;
 
-    private static int buttonOffset_pvp = 0;
-    private static int buttonOffset_arcade = 0;
+    private static int offset_menu_left = 0;
+    private static int offset_menu_right = 0;
 
     private static String text_left;
     private static int offset_left = 0;
@@ -56,22 +57,24 @@ public class MenuGUI extends GuiScreen {
     private static String text_bottom;
     private static int offset_bottom = -5;
     private static String command_bottom;
-    private static float color_left = 0xff00102b;
+    private static float color_left;
 
     private static String text_top;
     private static int offset_top = 5;
     private static String command_top;
-    private static float color_right = 0xff001c03;
+    private static float color_right;
 
     static void init() {
         left_texts.clear();
         left_commands.clear();
         left_offsets.clear();
         left_icons.clear();
+        left_icons_extra.clear();
         right_texts.clear();
         right_commands.clear();
         right_offsets.clear();
         right_icons.clear();
+        right_icons_extra.clear();
 
         JsonObject menuJson = new JsonObject();
 
@@ -105,11 +108,34 @@ public class MenuGUI extends GuiScreen {
             command_top = "classic";
         }
 
+
         if ((text_left = addFormatting(FileHandler.getValue(menuJson, "left.name"))).equals("null")) {
             text_left = EnumChatFormatting.BLUE + "PvP Minigames";
         }
+        String temp_color_left;
+        if ((temp_color_left = FileHandler.getValue(menuJson, "left.color")).equals("null")) {
+            color_left = 0x00102b;
+        } else {
+            try {
+                color_left = Integer.parseInt(temp_color_left.replaceFirst("#", ""), 16) ;
+            } catch (Exception e) {
+                e.printStackTrace();
+                color_left = 0x00102b;
+            }
+        }
+
         if ((text_right = addFormatting(FileHandler.getValue(menuJson, "right.name"))).equals("null")) {
             text_right = EnumChatFormatting.DARK_GREEN + "Arcade Minigames";
+        }
+        String temp_color_right;
+        if ((temp_color_right = FileHandler.getValue(menuJson, "right.color")).equals("null")) {
+            color_right = 0x001c03;
+        } else {
+            try {
+                color_right = Integer.parseInt(temp_color_right.replaceFirst("#", ""), 16);
+            } catch (Exception e) {
+                color_right = 0x001c03;
+            }
         }
 
         JsonArray leftButtons = new JsonParser().parse(FileHandler.getValue(menuJson, "left.buttons")).getAsJsonArray();
@@ -127,6 +153,10 @@ public class MenuGUI extends GuiScreen {
             extra += ",";
             if (!FileHandler.getValue(leftButton.getAsJsonObject(), "icon.owner").equals("null")) {
                 extra += "owner="+FileHandler.getValue(leftButton.getAsJsonObject(), "icon.owner");
+            }
+            extra += ",";
+            if (!FileHandler.getValue(leftButton.getAsJsonObject(), "icon.color").equals("null")) {
+                extra += "color="+FileHandler.getValue(leftButton.getAsJsonObject(), "icon.color");
             }
 
             if (extra.equals(",")) {extra = "";}
@@ -148,6 +178,10 @@ public class MenuGUI extends GuiScreen {
             extra += ",";
             if (!FileHandler.getValue(rightButton.getAsJsonObject(), "icon.owner").equals("null")) {
                 extra += "owner="+FileHandler.getValue(rightButton.getAsJsonObject(), "icon.owner");
+            }
+            extra += ",";
+            if (!FileHandler.getValue(rightButton.getAsJsonObject(), "icon.color").equals("null")) {
+                extra += "owner="+FileHandler.getValue(rightButton.getAsJsonObject(), "icon.color");
             }
 
             if (extra.equals(",")) {extra = "";}
@@ -215,10 +249,10 @@ public class MenuGUI extends GuiScreen {
     private void mouseHover(int x, int y) {
         if (menu == 0 || menu == -1) {
             if (y > height - (height/7)) {
-                buttonOffset_pvp = floor(Animation.interp(buttonOffset_pvp, -100, 5, 1));
+                offset_menu_left = floor(Animation.interp(offset_menu_left, -100, 5, 1));
                 offset_left = floor(Animation.interp(offset_left, width/4, 5, 1));
                 underline_left = floor(Animation.interp(underline_left, 0, 5, 1));
-                buttonOffset_arcade = floor(Animation.interp(buttonOffset_arcade, -100, 5, 1));
+                offset_menu_right = floor(Animation.interp(offset_menu_right, -100, 5, 1));
                 offset_right = floor(Animation.interp(offset_right, width - width/4, 5, 1));
                 underline_right = floor(Animation.interp(underline_right, 0, 5, 1));
                 for (int i=0; i<right_texts.size(); i++) {
@@ -228,12 +262,12 @@ public class MenuGUI extends GuiScreen {
                     left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, 5, 1)));
                 }
                 offset_bottom = floor(Animation.interp(offset_bottom,  -height/7, 5, 1));
-                offset_top = floor(Animation.interp(offset_top, 5, 5, 1));
+                offset_top = floor(Animation.interp(offset_top, 15, 5, 1));
             } else if (y < height/7) {
-                buttonOffset_pvp = floor(Animation.interp(buttonOffset_pvp, -100, 5, 1));
+                offset_menu_left = floor(Animation.interp(offset_menu_left, -100, 5, 1));
                 offset_left = floor(Animation.interp(offset_left, width/4, 5, 1));
                 underline_left = floor(Animation.interp(underline_left, 0, 5, 1));
-                buttonOffset_arcade = floor(Animation.interp(buttonOffset_arcade, -100, 5, 1));
+                offset_menu_right = floor(Animation.interp(offset_menu_right, -100, 5, 1));
                 offset_right = floor(Animation.interp(offset_right, width - width/4, 5, 1));
                 underline_right = floor(Animation.interp(underline_right, 0, 5, 1));
                 for (int i=0; i<right_texts.size(); i++) {
@@ -242,19 +276,19 @@ public class MenuGUI extends GuiScreen {
                 for (int i=0; i<left_texts.size(); i++) {
                     left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, 5, 1)));
                 }
-                offset_bottom = floor(Animation.interp(offset_bottom,  0, 5, 1));
+                offset_bottom = floor(Animation.interp(offset_bottom,  -12, 5, 1));
                 offset_top = floor(Animation.interp(offset_top, height/7, 5, 1));
             } else {
-                offset_top = floor(Animation.interp(offset_top, 5, 5, 1));
-                offset_bottom = floor(Animation.interp(offset_bottom, 0, 5, 1));
+                offset_top = floor(Animation.interp(offset_top, 15, 5, 1));
+                offset_bottom = floor(Animation.interp(offset_bottom, -12, 5, 1));
                 if (x < width/2) {
                     for (int i=0; i<right_texts.size(); i++) {
                         right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, 5, 1)));
                     }
-                    buttonOffset_pvp = floor(Animation.interp(buttonOffset_pvp, 50, 5, 1));
+                    offset_menu_left = floor(Animation.interp(offset_menu_left, 50, 5, 1));
                     offset_left = floor(Animation.interp(offset_left, width/3, 5, 1));
-                    underline_left = floor(Animation.interp(underline_left, ren.getStringWidth(text_left)/2, 5, 1));
-                    buttonOffset_arcade = floor(Animation.interp(buttonOffset_arcade, -40, 5, 1));
+                    underline_left = floor(Animation.interp(underline_left, 50, 5, 1));
+                    offset_menu_right = floor(Animation.interp(offset_menu_right, -40, 5, 1));
                     offset_right = floor(Animation.interp(offset_right, width - width/4, 5, 1));
                     underline_right = floor(Animation.interp(underline_right, 0, 5, 1));
 
@@ -272,15 +306,17 @@ public class MenuGUI extends GuiScreen {
                         }
                     }
                 } else {
+                    offset_top = floor(Animation.interp(offset_top, 15, 5, 1));
+                    offset_bottom = floor(Animation.interp(offset_bottom, -12, 5, 1));
                     for (int i=0; i<left_texts.size(); i++) {
                         left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, 5, 1)));
                     }
-                    buttonOffset_pvp = floor(Animation.interp(buttonOffset_pvp, -40, 5, 1));
+                    offset_menu_left = floor(Animation.interp(offset_menu_left, -40, 5, 1));
                     offset_left = floor(Animation.interp(offset_left, width/4, 5, 1));
                     underline_left = floor(Animation.interp(underline_left, 0, 5, 1));
-                    buttonOffset_arcade = floor(Animation.interp(buttonOffset_arcade, 50, 5, 1));
+                    offset_menu_right = floor(Animation.interp(offset_menu_right, 50, 5, 1));
                     offset_right = floor(Animation.interp(offset_right, width - width/3, 5, 1));
-                    underline_right = floor(Animation.interp(underline_right, ren.getStringWidth(text_right)/2, 5, 1));
+                    underline_right = floor(Animation.interp(underline_right, 50, 5, 1));
 
                     if (x > offset_right-100 && x < offset_right+100) {
                         for (int i=0; i<right_texts.size(); i++) {
@@ -298,11 +334,11 @@ public class MenuGUI extends GuiScreen {
                 }
             }
         } else {
-            buttonOffset_pvp = floor(Animation.interp(buttonOffset_pvp, -width/2-20, 10, 1));
+            offset_menu_left = floor(Animation.interp(offset_menu_left, -width/2-20, 10, 1));
             offset_left = floor(Animation.interp(offset_left, -width/2-20 + width/4, 10, 1));
             underline_left = floor(Animation.interp(underline_left, 0, 5, 1));
 
-            buttonOffset_arcade = floor(Animation.interp(buttonOffset_arcade, -width/2-20, 10, 1));
+            offset_menu_right = floor(Animation.interp(offset_menu_right, -width/2-20, 10, 1));
             offset_right = floor(Animation.interp(offset_right, width/2+20 + width - width/4, 10, 1));
             underline_right = floor(Animation.interp(underline_right, 0, 6, 1));
 
@@ -314,7 +350,7 @@ public class MenuGUI extends GuiScreen {
             }
 
             offset_bottom = floor(Animation.interp(offset_bottom,  21, 10, 1));
-            offset_top = floor(Animation.interp(offset_top, -1, 10, 1));
+            offset_top = floor(Animation.interp(offset_top, -10, 10, 1));
 
             if (offset_bottom == 12) {
                 MC.thePlayer.closeScreen();
@@ -340,8 +376,8 @@ public class MenuGUI extends GuiScreen {
         if (menu == -1) {
             offset_left = floor(-width/2-20);
             offset_right = floor(width/2+20 + width - width/4);
-            buttonOffset_pvp = floor(-width/2-20);
-            buttonOffset_arcade = floor(-width/2-20);
+            offset_menu_left = floor(-width/2-20);
+            offset_menu_right = floor(-width/2-20);
             underline_left = 0;
             underline_right = 0;
             for (int i=0; i<left_offsets.size(); i++) {
@@ -350,16 +386,17 @@ public class MenuGUI extends GuiScreen {
             for (int i=0; i<right_offsets.size(); i++) {
                 right_offsets.set(i, 0);
             }
-            offset_bottom = -5;
-            offset_top = 5;
+            offset_bottom = 10;
+            offset_top = -10;
             menu = 0;
         }
 
         if (menu == 0 || menu == 1) {
-            drawRect(0, 0, floor(width/2) - 5 + buttonOffset_pvp, floor(height), 0x50000000);
+            drawRect(0, 0, floor(width/2) - 5 + offset_menu_left, floor(height), 0x50000000);
+            drawRect(offset_left-ren.getStringWidth(text_left)/2-3, floor(height/4)-2, offset_left+ren.getStringWidth(text_left)/2+3, floor(height/4)+10, 0x50000000);
             drawCenteredString(ren, text_left, offset_left, floor(height/4), 0xffffffff);
             if (underline_left > 0) {
-                drawHorizontalLine(offset_left - underline_left, offset_left + underline_left, floor(height/4)+10, 0xffffffff);
+                drawHorizontalLine(offset_left - underline_left, offset_left + underline_left, floor(height/4)+13, 0xffffffff);
             }
 
             int i = 0;
@@ -370,8 +407,8 @@ public class MenuGUI extends GuiScreen {
 
                 int meta = 0;
                 String owner = "";
-                String extra = left_icons_extra.get(i);
-                for (String value : extra.split(",")) {
+                String color = "";
+                for (String value : left_icons_extra.get(i).split(",")) {
                     if (value.startsWith("meta=")) {
                         try {
                             meta = Integer.parseInt(value.substring(5));
@@ -380,27 +417,37 @@ public class MenuGUI extends GuiScreen {
                         }
                     } else if (value.startsWith("owner=")) {
                         owner = value.substring(6);
+                    } else if (value.startsWith("color=")) {
+                        color = value.substring(6);
                     }
                 }
                 ItemStack itemStack = new ItemStack(left_icons.get(i), 1, meta);
+                itemStack.setTagCompound(new NBTTagCompound());
                 if (!owner.equals("")) {
-                    itemStack.setTagCompound(new NBTTagCompound());
                     itemStack.getTagCompound().setTag("SkullOwner", new NBTTagString(owner));
+                }
+                if (!color.equals("")) {
+                    try {
+                        NBTTagCompound colorCompound = new NBTTagCompound();
+                        colorCompound.setInteger("color", Integer.parseInt(color.replace("#", ""), 16));
+                        itemStack.getTagCompound().setTag("display", colorCompound);
+                    } catch (NumberFormatException e) {}
                 }
 
                 int drawY = floor(height/4)+20 + (i*17);
 
-                drawRect(drawX-(drawW/2)-3-drawO, drawY-3, drawX+(drawW/2)+3+drawO, drawY+11, (int) color_left);
+                drawRect(drawX-(drawW/2)-3-drawO, drawY-3, drawX+(drawW/2)+3+drawO, drawY+11, (int) (color_left+0xff000000));
                 drawCenteredString(ren, button, drawX, drawY, 0xffffffff);
                 drawItemIcon(drawX-(drawW/2)-3-(drawO/2), drawY-4, itemStack);
                 drawItemIcon(drawX+(drawW/2)-13+(drawO/2), drawY-4, itemStack);
                 i++;
             }
 
-            drawRect(floor(width/2) + 5 - buttonOffset_arcade, 0, floor(width), floor(height), 0x50000000);
+            drawRect(floor(width/2) + 5 - offset_menu_right, 0, floor(width), floor(height), 0x50000000);
+            drawRect(offset_right-ren.getStringWidth(text_right)/2-3, floor(height/4)-2, offset_right+ren.getStringWidth(text_right)/2+3, floor(height/4)+10, 0x50000000);
             drawCenteredString(ren, text_right, offset_right, floor(height/4), 0xffffffff);
             if (underline_right > 0) {
-                drawHorizontalLine(offset_right - underline_right, offset_right + underline_right, floor(height/4)+10, 0xffffffff);
+                drawHorizontalLine(offset_right - underline_right, offset_right + underline_right, floor(height/4)+13, 0xffffffff);
             }
 
             i = 0;
@@ -411,6 +458,7 @@ public class MenuGUI extends GuiScreen {
 
                 int meta = 0;
                 String owner = "";
+                String color = "";
                 String extra = right_icons_extra.get(i);
                 for (String value : extra.split(",")) {
                     if (value.startsWith("meta=")) {
@@ -421,17 +469,26 @@ public class MenuGUI extends GuiScreen {
                         }
                     } else if (value.startsWith("owner=")) {
                         owner = value.substring(6);
+                    } else if (value.startsWith("color=")) {
+                        color = value.substring(6);
                     }
                 }
                 ItemStack itemStack = new ItemStack(right_icons.get(i), 1, meta);
+                itemStack.setTagCompound(new NBTTagCompound());
                 if (!owner.equals("")) {
-                    itemStack.setTagCompound(new NBTTagCompound());
                     itemStack.getTagCompound().setTag("SkullOwner", new NBTTagString(owner));
+                }
+                if (!color.equals("")) {
+                    try {
+                        NBTTagCompound colorCompound = new NBTTagCompound();
+                        colorCompound.setInteger("color", Integer.parseInt(color.replace("#",""), 16));
+                        itemStack.getTagCompound().setTag("display", colorCompound);
+                    } catch (NumberFormatException e) {}
                 }
 
                 int drawY = floor(height/4)+20 + (i*17);
 
-                drawRect(drawX-(drawW/2)-3-drawO, drawY-3, drawX+(drawW/2)+3+drawO, drawY+11, (int) color_right);
+                drawRect(drawX-(drawW/2)-3-drawO, drawY-3, drawX+(drawW/2)+3+drawO, drawY+11, (int) (color_right+0xff000000));
                 drawCenteredString(ren, button, drawX, drawY, 0xffffffff);
                 drawItemIcon(drawX-(drawW/2)-3-(drawO/2), drawY-4, itemStack);
                 drawItemIcon(drawX+(drawW/2)-13+(drawO/2), drawY-4, itemStack);
@@ -439,10 +496,10 @@ public class MenuGUI extends GuiScreen {
             }
 
             drawRect(0, floor(height + offset_bottom), floor(width), floor(height), 0xff000000);
-            drawCenteredString(ren, text_bottom, floor(width / 2), floor(height + offset_bottom/2), 0xffffffff);
+            drawCenteredString(ren, text_bottom, floor(width / 2), floor(height + offset_bottom/2)-3, 0xffffffff);
 
             drawRect(0, floor(offset_top), floor(width), 0, 0xff000000);
-            drawCenteredString(ren, text_top, floor(width/2), floor(offset_top/2 - 10), 0xffffffff);
+            drawCenteredString(ren, text_top, floor(width/2), floor(offset_top/2 - 10)+5, 0xffffffff);
         }
 
         super.drawScreen(x, y, ticks);

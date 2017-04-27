@@ -1,7 +1,5 @@
 package com.kerbybit.GameMenu;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -15,13 +13,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 
-@Mod(modid = "gm", name = "GameMenu", version = "0.7")
+@Mod(modid = "gm", name = "GameMenu", version = "0.8")
 public class Main {
     static Boolean openMenu = false;
     static String dir = "./mods/GameMenu/";
     private KeyBinding openMenuKey;
-    private Minecraft mc = Minecraft.getMinecraft();
-    private EntityPlayerSP player = mc.thePlayer;
     static Boolean worldLoaded = false;
 
     @Mod.EventHandler

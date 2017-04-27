@@ -18,7 +18,7 @@ public class CommandMenu extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/game <reload/files>";
+        return "/game <reload/files/reset>";
     }
     private void showCommandUsage(ICommandSender sender) {
         showMessage(EnumChatFormatting.RED + getCommandUsage(sender));
@@ -52,6 +52,15 @@ public class CommandMenu extends CommandBase {
                     } catch (Exception e) {
                         e.printStackTrace();
                         showMessage(EnumChatFormatting.RED + "Could not find GameMenu files!");
+                    }
+                } else if (args[0].equalsIgnoreCase("reset")) {
+                    try {
+                        FileHandler.generateFile();
+                        MenuGUI.init();
+                        showMessage(EnumChatFormatting.DARK_AQUA + "Reset GameMenu config");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        showMessage(EnumChatFormatting.RED + "Unable to reset GameMenu config file!");
                     }
                 } else {
                    showCommandUsage(sender);

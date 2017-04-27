@@ -53,7 +53,6 @@ class FileHandler {
             }
             return returnString;
         } catch (Exception e) {
-            //e.printStackTrace();
             return "null";
         }
     }
@@ -66,7 +65,8 @@ class FileHandler {
                 "        \"command\":\"classic\"\n" +
                 "    },\n" +
                 "    \"left\":{\n" +
-                "        \"name\":\"&9PvP Minigames\",\n" +
+                "        \"name\":\"&3&lPvP Minigames\",\n" +
+                "        \"color\":\"#00102b\",\n" +
                 "        \"buttons\":[\n" +
                 "            {\n" +
                 "                \"name\":\"Blitz\",\n" +
@@ -116,7 +116,8 @@ class FileHandler {
                 "        ]\n" +
                 "    },\n" +
                 "    \"right\":{\n" +
-                "        \"name\":\"&2Arcade Minigames\",\n" +
+                "        \"name\":\"&2&lArcade Minigames\",\n" +
+                "        \"color\":\"#001c03\",\n" +
                 "        \"buttons\":[\n" +
                 "            {\n" +
                 "                \"name\":\"Arcade Games\",\n" +
