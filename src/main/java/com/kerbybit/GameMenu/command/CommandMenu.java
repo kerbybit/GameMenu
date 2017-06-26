@@ -1,5 +1,8 @@
-package com.kerbybit.GameMenu;
+package com.kerbybit.GameMenu.command;
 
+import com.kerbybit.GameMenu.Main;
+import com.kerbybit.GameMenu.MenuGUI;
+import com.kerbybit.GameMenu.util.FileHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -23,7 +26,7 @@ public class CommandMenu extends CommandBase {
     private void showCommandUsage(ICommandSender sender) {
         showMessage(EnumChatFormatting.RED + getCommandUsage(sender));
     }
-    static void showMessage(String message) {
+    public static void showMessage(String message) {
         if (Main.worldLoaded) {
             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(message));
         } else {

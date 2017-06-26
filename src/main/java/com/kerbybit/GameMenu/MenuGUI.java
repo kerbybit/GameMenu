@@ -4,12 +4,17 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.kerbybit.GameMenu.command.CommandMenu;
+import com.kerbybit.GameMenu.util.Animation;
+import com.kerbybit.GameMenu.util.FileHandler;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -29,6 +34,8 @@ public class MenuGUI extends GuiScreen {
     private static long sysTime = Minecraft.getSystemTime();
 
     private static int menu = 0;
+
+    private static float animationSpeed = 5;
 
     private static int offset_menu_left = 0;
     private static int offset_menu_right = 0;
@@ -64,7 +71,7 @@ public class MenuGUI extends GuiScreen {
     private static String command_top;
     private static float color_right;
 
-    static void init() {
+    public static void init() {
         left_texts.clear();
         left_commands.clear();
         left_offsets.clear();
@@ -80,11 +87,11 @@ public class MenuGUI extends GuiScreen {
 
         FileHandler.checkDir();
         try {
-            menuJson = FileHandler.loadFile("menu.json");
+            menuJson = FileHandler.loadFile();
         } catch (IOException e) {
             try {
                 FileHandler.generateFile();
-                menuJson = FileHandler.loadFile("menu.json");
+                menuJson = FileHandler.loadFile();
             } catch (IOException exception) {
                 e.printStackTrace();
                 CommandMenu.showMessage(EnumChatFormatting.RED + "Unable to load menu.json! IOException");
@@ -93,6 +100,23 @@ public class MenuGUI extends GuiScreen {
             e.printStackTrace();
             CommandMenu.showMessage(EnumChatFormatting.RED + "Unable to load menu.json! Unknown Exception");
         }
+
+        animationSpeed = getFloat(menuJson, "settings.animation speed", 5);
+
+        String tempSettingString = FileHandler.getValue(menuJson, "settings.particles.enabled");
+        ParticleHandler.enabled = tempSettingString.equals("null") || tempSettingString.equals("true");
+
+        ParticleHandler.partSize = getFloat(menuJson, "settings.particles.particle size", 1, true);
+        ParticleHandler.lineSize = getFloat(menuJson, "settings.particles.line thickness", 0.25f, true);
+        ParticleHandler.lineMaxLength = getFloat(menuJson, "settings.particles.line max length", 50);
+
+        ParticleHandler.partRed = getInt(menuJson, "settings.particles.particle color.red");
+        ParticleHandler.partGreen = getInt(menuJson, "settings.particles.particle color.green");
+        ParticleHandler.partBlue = getInt(menuJson, "settings.particles.particle color.blue");
+
+        ParticleHandler.lineRed = getInt(menuJson, "settings.particles.line color.red");
+        ParticleHandler.lineGreen = getInt(menuJson, "settings.particles.line color.green");
+        ParticleHandler.lineBlue = getInt(menuJson, "settings.particles.line color.blue");
 
         if ((text_bottom = addFormatting(FileHandler.getValue(menuJson, "bottom.name"))).equals("null")) {
             text_bottom = EnumChatFormatting.RED + "Exit";
@@ -117,7 +141,7 @@ public class MenuGUI extends GuiScreen {
             color_left = 0x00102b;
         } else {
             try {
-                color_left = Integer.parseInt(temp_color_left.replaceFirst("#", ""), 16) ;
+                color_left = Integer.parseInt(temp_color_left.replaceFirst("#", ""), 16);
             } catch (Exception e) {
                 e.printStackTrace();
                 color_left = 0x00102b;
@@ -143,23 +167,35 @@ public class MenuGUI extends GuiScreen {
             left_texts.add(FileHandler.getValue(leftButton.getAsJsonObject(), "name"));
             left_commands.add(FileHandler.getValue(leftButton.getAsJsonObject(), "command"));
             left_offsets.add(0);
-            left_icons.add(Item.getByNameOrId(FileHandler.getValue(leftButton.getAsJsonObject(), "icon.item")));
+            Item item = Item.getByNameOrId(FileHandler.getValue(leftButton.getAsJsonObject(), "icon.item"));
+            if (item == null) {
+                item = Block.getBlockFromName(FileHandler.getValue(leftButton.getAsJsonObject(), "icon.item")).getItem(null, null);
+                if (item == null) {
+                    left_icons.add(Blocks.barrier.getItem(null, null));
+                } else {
+                    left_icons.add(item);
+                }
+            } else {
+                left_icons.add(item);
+            }
 
             String extra = "";
 
             if (!FileHandler.getValue(leftButton.getAsJsonObject(), "icon.meta").equals("null")) {
-                extra += "meta="+FileHandler.getValue(leftButton.getAsJsonObject(), "icon.meta");
+                extra += "meta=" + FileHandler.getValue(leftButton.getAsJsonObject(), "icon.meta");
             }
             extra += ",";
             if (!FileHandler.getValue(leftButton.getAsJsonObject(), "icon.owner").equals("null")) {
-                extra += "owner="+FileHandler.getValue(leftButton.getAsJsonObject(), "icon.owner");
+                extra += "owner=" + FileHandler.getValue(leftButton.getAsJsonObject(), "icon.owner");
             }
             extra += ",";
             if (!FileHandler.getValue(leftButton.getAsJsonObject(), "icon.color").equals("null")) {
-                extra += "color="+FileHandler.getValue(leftButton.getAsJsonObject(), "icon.color");
+                extra += "color=" + FileHandler.getValue(leftButton.getAsJsonObject(), "icon.color");
             }
 
-            if (extra.equals(",")) {extra = "";}
+            if (extra.equals(",")) {
+                extra = "";
+            }
             left_icons_extra.add(extra);
         }
 
@@ -168,25 +204,68 @@ public class MenuGUI extends GuiScreen {
             right_texts.add(FileHandler.getValue(rightButton.getAsJsonObject(), "name"));
             right_commands.add(FileHandler.getValue(rightButton.getAsJsonObject(), "command"));
             right_offsets.add(0);
-            right_icons.add(Item.getByNameOrId(FileHandler.getValue(rightButton.getAsJsonObject(), "icon.item")));
+            Item item = Item.getByNameOrId(FileHandler.getValue(rightButton.getAsJsonObject(), "icon.item"));
+            if (item == null) {
+                item = Block.getBlockFromName(FileHandler.getValue(rightButton.getAsJsonObject(), "icon.item")).getItem(null, null);
+                if (item == null) {
+                    right_icons.add(Blocks.barrier.getItem(null, null));
+                } else {
+                    right_icons.add(item);
+                }
+            } else {
+                right_icons.add(item);
+            }
 
             String extra = "";
 
             if (!FileHandler.getValue(rightButton.getAsJsonObject(), "icon.meta").equals("null")) {
-                extra += "meta="+FileHandler.getValue(rightButton.getAsJsonObject(), "icon.meta");
+                extra += "meta=" + FileHandler.getValue(rightButton.getAsJsonObject(), "icon.meta");
             }
             extra += ",";
             if (!FileHandler.getValue(rightButton.getAsJsonObject(), "icon.owner").equals("null")) {
-                extra += "owner="+FileHandler.getValue(rightButton.getAsJsonObject(), "icon.owner");
+                extra += "owner=" + FileHandler.getValue(rightButton.getAsJsonObject(), "icon.owner");
             }
             extra += ",";
             if (!FileHandler.getValue(rightButton.getAsJsonObject(), "icon.color").equals("null")) {
-                extra += "owner="+FileHandler.getValue(rightButton.getAsJsonObject(), "icon.color");
+                extra += "owner=" + FileHandler.getValue(rightButton.getAsJsonObject(), "icon.color");
             }
 
-            if (extra.equals(",")) {extra = "";}
+            if (extra.equals(",")) {
+                extra = "";
+            }
             right_icons_extra.add(extra);
         }
+    }
+
+    private static int getInt(JsonObject menuJson, String key) {
+        String tempSettingString = FileHandler.getValue(menuJson, key);
+        if (!tempSettingString.equals("null")) {
+            try {
+                return Integer.parseInt(tempSettingString);
+            } catch (NumberFormatException exception) {
+                return 255;
+            }
+        }
+        return 255;
+    }
+
+    private static float getFloat(JsonObject menuJson, String key, float defaultValue, Boolean getHalf) {
+        String tempSettingString = FileHandler.getValue(menuJson, key);
+        if (!tempSettingString.equals("null")) {
+            try {
+                if (getHalf)
+                    return Float.parseFloat(tempSettingString)/2;
+                else
+                    return Float.parseFloat(tempSettingString);
+            } catch (NumberFormatException exception) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
+    }
+
+    private static float getFloat(JsonObject menuJson, String key, float defaultValue) {
+        return getFloat(menuJson, key, defaultValue, false);
     }
 
     static void openGui() {
@@ -249,108 +328,108 @@ public class MenuGUI extends GuiScreen {
     private void mouseHover(int x, int y) {
         if (menu == 0 || menu == -1) {
             if (y > height - (height/7)) {
-                offset_menu_left = floor(Animation.interp(offset_menu_left, -100, 5, 1));
-                offset_left = floor(Animation.interp(offset_left, width/4, 5, 1));
-                underline_left = floor(Animation.interp(underline_left, 0, 5, 1));
-                offset_menu_right = floor(Animation.interp(offset_menu_right, -100, 5, 1));
-                offset_right = floor(Animation.interp(offset_right, width - width/4, 5, 1));
-                underline_right = floor(Animation.interp(underline_right, 0, 5, 1));
+                offset_menu_left = floor(Animation.interp(offset_menu_left, -100, animationSpeed));
+                offset_left = floor(Animation.interp(offset_left, width/4, animationSpeed));
+                underline_left = floor(Animation.interp(underline_left, 0, animationSpeed));
+                offset_menu_right = floor(Animation.interp(offset_menu_right, -100, animationSpeed));
+                offset_right = floor(Animation.interp(offset_right, width - width/4, animationSpeed));
+                underline_right = floor(Animation.interp(underline_right, 0, animationSpeed));
                 for (int i=0; i<right_texts.size(); i++) {
-                    right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, 5, 1)));
+                    right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, animationSpeed)));
                 }
                 for (int i=0; i<left_texts.size(); i++) {
-                    left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, 5, 1)));
+                    left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, animationSpeed)));
                 }
-                offset_bottom = floor(Animation.interp(offset_bottom,  -height/7, 5, 1));
-                offset_top = floor(Animation.interp(offset_top, 15, 5, 1));
+                offset_bottom = floor(Animation.interp(offset_bottom,  -height/7, animationSpeed));
+                offset_top = floor(Animation.interp(offset_top, 15, animationSpeed));
             } else if (y < height/7) {
-                offset_menu_left = floor(Animation.interp(offset_menu_left, -100, 5, 1));
-                offset_left = floor(Animation.interp(offset_left, width/4, 5, 1));
-                underline_left = floor(Animation.interp(underline_left, 0, 5, 1));
-                offset_menu_right = floor(Animation.interp(offset_menu_right, -100, 5, 1));
-                offset_right = floor(Animation.interp(offset_right, width - width/4, 5, 1));
-                underline_right = floor(Animation.interp(underline_right, 0, 5, 1));
+                offset_menu_left = floor(Animation.interp(offset_menu_left, -100, animationSpeed));
+                offset_left = floor(Animation.interp(offset_left, width/4, animationSpeed));
+                underline_left = floor(Animation.interp(underline_left, 0, animationSpeed));
+                offset_menu_right = floor(Animation.interp(offset_menu_right, -100, animationSpeed));
+                offset_right = floor(Animation.interp(offset_right, width - width/4, animationSpeed));
+                underline_right = floor(Animation.interp(underline_right, 0, 5));
                 for (int i=0; i<right_texts.size(); i++) {
-                    right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, 5, 1)));
+                    right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, animationSpeed)));
                 }
                 for (int i=0; i<left_texts.size(); i++) {
-                    left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, 5, 1)));
+                    left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, animationSpeed)));
                 }
-                offset_bottom = floor(Animation.interp(offset_bottom,  -12, 5, 1));
-                offset_top = floor(Animation.interp(offset_top, height/7, 5, 1));
+                offset_bottom = floor(Animation.interp(offset_bottom,  -12, animationSpeed));
+                offset_top = floor(Animation.interp(offset_top, height/7, animationSpeed));
             } else {
-                offset_top = floor(Animation.interp(offset_top, 15, 5, 1));
-                offset_bottom = floor(Animation.interp(offset_bottom, -12, 5, 1));
+                offset_top = floor(Animation.interp(offset_top, 15, animationSpeed));
+                offset_bottom = floor(Animation.interp(offset_bottom, -12, animationSpeed));
                 if (x < width/2) {
                     for (int i=0; i<right_texts.size(); i++) {
-                        right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, 5, 1)));
+                        right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, animationSpeed)));
                     }
-                    offset_menu_left = floor(Animation.interp(offset_menu_left, 50, 5, 1));
-                    offset_left = floor(Animation.interp(offset_left, width/3, 5, 1));
-                    underline_left = floor(Animation.interp(underline_left, 50, 5, 1));
-                    offset_menu_right = floor(Animation.interp(offset_menu_right, -40, 5, 1));
-                    offset_right = floor(Animation.interp(offset_right, width - width/4, 5, 1));
-                    underline_right = floor(Animation.interp(underline_right, 0, 5, 1));
+                    offset_menu_left = floor(Animation.interp(offset_menu_left, 50, animationSpeed));
+                    offset_left = floor(Animation.interp(offset_left, width/3, animationSpeed));
+                    underline_left = floor(Animation.interp(underline_left, 50, animationSpeed));
+                    offset_menu_right = floor(Animation.interp(offset_menu_right, -40, animationSpeed));
+                    offset_right = floor(Animation.interp(offset_right, width - width/4, animationSpeed));
+                    underline_right = floor(Animation.interp(underline_right, 0, animationSpeed));
 
                     if (x > offset_left-100 && x < offset_left+100) {
                         for (int i=0; i<left_texts.size(); i++) {
                             if (y > floor(height/4)+ 17 + (i*17) && y < floor(height/4)+ 31 + (i*17)) {
-                                left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 25, 5, 1)));
+                                left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 25, animationSpeed)));
                             } else {
-                                left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, 5, 1)));
+                                left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, animationSpeed)));
                             }
                         }
                     } else {
                         for (int i=0; i<left_texts.size(); i++) {
-                            left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, 5, 1)));
+                            left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, animationSpeed)));
                         }
                     }
                 } else {
-                    offset_top = floor(Animation.interp(offset_top, 15, 5, 1));
-                    offset_bottom = floor(Animation.interp(offset_bottom, -12, 5, 1));
+                    offset_top = floor(Animation.interp(offset_top, 15, animationSpeed));
+                    offset_bottom = floor(Animation.interp(offset_bottom, -12, animationSpeed));
                     for (int i=0; i<left_texts.size(); i++) {
-                        left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, 5, 1)));
+                        left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, animationSpeed)));
                     }
-                    offset_menu_left = floor(Animation.interp(offset_menu_left, -40, 5, 1));
-                    offset_left = floor(Animation.interp(offset_left, width/4, 5, 1));
-                    underline_left = floor(Animation.interp(underline_left, 0, 5, 1));
-                    offset_menu_right = floor(Animation.interp(offset_menu_right, 50, 5, 1));
-                    offset_right = floor(Animation.interp(offset_right, width - width/3, 5, 1));
-                    underline_right = floor(Animation.interp(underline_right, 50, 5, 1));
+                    offset_menu_left = floor(Animation.interp(offset_menu_left, -40, animationSpeed));
+                    offset_left = floor(Animation.interp(offset_left, width/4, animationSpeed));
+                    underline_left = floor(Animation.interp(underline_left, 0, animationSpeed));
+                    offset_menu_right = floor(Animation.interp(offset_menu_right, 50, animationSpeed));
+                    offset_right = floor(Animation.interp(offset_right, width - width/3, animationSpeed));
+                    underline_right = floor(Animation.interp(underline_right, 50, 5));
 
                     if (x > offset_right-100 && x < offset_right+100) {
                         for (int i=0; i<right_texts.size(); i++) {
                             if (y > floor(height/4)+ 17 + (i*17) && y < floor(height/4)+ 31 + (i*17)) {
-                                right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 25, 5, 1)));
+                                right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 25, animationSpeed)));
                             } else {
-                                right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, 5, 1)));
+                                right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, animationSpeed)));
                             }
                         }
                     } else {
                         for (int i=0; i<right_texts.size(); i++) {
-                            right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, 5, 1)));
+                            right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, animationSpeed)));
                         }
                     }
                 }
             }
         } else {
-            offset_menu_left = floor(Animation.interp(offset_menu_left, -width/2-20, 10, 1));
-            offset_left = floor(Animation.interp(offset_left, -width/2-20 + width/4, 10, 1));
-            underline_left = floor(Animation.interp(underline_left, 0, 5, 1));
+            offset_menu_left = floor(Animation.interp(offset_menu_left, -width/2-20, animationSpeed*2));
+            offset_left = floor(Animation.interp(offset_left, -width/2-20 + width/4, animationSpeed*2));
+            underline_left = floor(Animation.interp(underline_left, 0, animationSpeed));
 
-            offset_menu_right = floor(Animation.interp(offset_menu_right, -width/2-20, 10, 1));
-            offset_right = floor(Animation.interp(offset_right, width/2+20 + width - width/4, 10, 1));
-            underline_right = floor(Animation.interp(underline_right, 0, 6, 1));
+            offset_menu_right = floor(Animation.interp(offset_menu_right, -width/2-20, animationSpeed*2));
+            offset_right = floor(Animation.interp(offset_right, width/2+20 + width - width/4, animationSpeed*2));
+            underline_right = floor(Animation.interp(underline_right, 0, animationSpeed));
 
             for (int i=0; i<right_texts.size(); i++) {
-                right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, 5, 1)));
+                right_offsets.set(i, floor(Animation.interp(right_offsets.get(i), 0, animationSpeed)));
             }
             for (int i=0; i<left_texts.size(); i++) {
-                left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, 5, 1)));
+                left_offsets.set(i, floor(Animation.interp(left_offsets.get(i), 0, animationSpeed)));
             }
 
-            offset_bottom = floor(Animation.interp(offset_bottom,  21, 10, 1));
-            offset_top = floor(Animation.interp(offset_top, -10, 10, 1));
+            offset_bottom = floor(Animation.interp(offset_bottom,  21, animationSpeed*2));
+            offset_top = floor(Animation.interp(offset_top, -10, animationSpeed*2));
 
             if (offset_bottom == 12) {
                 MC.thePlayer.closeScreen();
@@ -372,8 +451,9 @@ public class MenuGUI extends GuiScreen {
             mouseHover(x, y);
         }
 
-
         if (menu == -1) {
+            ParticleHandler.init();
+
             offset_left = floor(-width/2-20);
             offset_right = floor(width/2+20 + width - width/4);
             offset_menu_left = floor(-width/2-20);
@@ -392,6 +472,8 @@ public class MenuGUI extends GuiScreen {
         }
 
         if (menu == 0 || menu == 1) {
+            ParticleHandler.draw(menu, x, y);
+
             drawRect(0, 0, floor(width/2) - 5 + offset_menu_left, floor(height), 0x50000000);
             drawRect(offset_left-ren.getStringWidth(text_left)/2-3, floor(height/4)-2, offset_left+ren.getStringWidth(text_left)/2+3, floor(height/4)+10, 0x50000000);
             drawCenteredString(ren, text_left, offset_left, floor(height/4), 0xffffffff);
@@ -431,7 +513,7 @@ public class MenuGUI extends GuiScreen {
                         NBTTagCompound colorCompound = new NBTTagCompound();
                         colorCompound.setInteger("color", Integer.parseInt(color.replace("#", ""), 16));
                         itemStack.getTagCompound().setTag("display", colorCompound);
-                    } catch (NumberFormatException e) {}
+                    } catch (NumberFormatException e) { /* do nothing */ }
                 }
 
                 int drawY = floor(height/4)+20 + (i*17);
@@ -483,7 +565,7 @@ public class MenuGUI extends GuiScreen {
                         NBTTagCompound colorCompound = new NBTTagCompound();
                         colorCompound.setInteger("color", Integer.parseInt(color.replace("#",""), 16));
                         itemStack.getTagCompound().setTag("display", colorCompound);
-                    } catch (NumberFormatException e) {}
+                    } catch (NumberFormatException e) { /* do nothing */ }
                 }
 
                 int drawY = floor(height/4)+20 + (i*17);

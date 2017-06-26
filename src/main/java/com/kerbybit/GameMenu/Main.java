@@ -1,5 +1,6 @@
 package com.kerbybit.GameMenu;
 
+import com.kerbybit.GameMenu.command.CommandMenu;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -13,12 +14,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 
-@Mod(modid = "gm", name = "GameMenu", version = "0.8")
+@Mod(modid = "gm", name = "GameMenu", version = "0.9")
 public class Main {
-    static Boolean openMenu = false;
-    static String dir = "./mods/GameMenu/";
+    public static Boolean openMenu = false;
+    public static String dir = "./mods/GameMenu/";
     private KeyBinding openMenuKey;
-    static Boolean worldLoaded = false;
+    public static Boolean worldLoaded = false;
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {

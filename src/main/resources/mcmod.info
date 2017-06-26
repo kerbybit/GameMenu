@@ -3,7 +3,7 @@
   "modid": "gm",
   "name": "GameMenu",
   "description": "Replace the compass on hypixel",
-  "version": "0.7",
+  "version": "0.9",
   "mcversion": "1.8.9",
   "url": "",
   "updateUrl": "",
