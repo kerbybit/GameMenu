@@ -22,12 +22,14 @@ public class ParticleHandler {
     static int partRed = 255;
     static int partGreen = 255;
     static int partBlue = 255;
+    static Boolean partRainbow = false;
 
     static float lineSize = 0.5f;
     static float lineMaxLength = 50;
     static int lineRed = 255;
     static int lineGreen = 255;
     static int lineBlue = 255;
+    static Boolean lineRainbow = false;
 
     private static float width;
     private static float height;
@@ -89,14 +91,16 @@ public class ParticleHandler {
         for (int i=0; i<partsX.size(); i++) {
             step(i);
 
-            drawLine(partsX.get(i), partsY.get(i), (double) x, (double) y, new Color(lineRed, lineGreen, lineBlue, alpha).getRGB());
-            drawRect(partsX.get(i) - partSize, partsY.get(i) - partSize, partsX.get(i) + partSize, partsY.get(i) + partSize, new Color(partRed, partGreen, partBlue, alpha).getRGB());
+            drawLine(partsX.get(i), partsY.get(i), (double) x, (double) y, new Color(lineRed, lineGreen, lineBlue, alpha).getRGB(), lineRainbow);
+            double size = partSize + partsYspeed.get(i);
+            drawRect(partsX.get(i) - size, partsY.get(i) - size, partsX.get(i) + size, partsY.get(i) + size, new Color(partRed, partGreen, partBlue, alpha).getRGB(), partRainbow);
         }
     }
 
-    private static void drawLine(Double x1, Double y1, Double x2, Double y2, int color) {
+    private static void drawLine(Double x1, Double y1, Double x2, Double y2, int color, Boolean rainbow) {
         double distance = Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2));
         if (distance < lineMaxLength) {
+
             double theta = -Math.atan2(y2 - y1, x2 - x1);
             double i = Math.sin(theta) * lineSize;
             double j = Math.cos(theta) * lineSize;
@@ -111,10 +115,28 @@ public class ParticleHandler {
             double cx = x2 - i;
             double cy = y2 - j;
 
-            float f3 = (float) (color >> 24 & 255) / 255.0F;
-            float f = (float) (color >> 16 & 255) / 255.0F;
-            float f1 = (float) (color >> 8 & 255) / 255.0F;
-            float f2 = (float) (color & 255) / 255.0F;
+            float a = (float) (1 - (distance / lineMaxLength));
+            float r;
+            float g;
+            float b;
+
+            if (rainbow) {
+                double step = Main.ticksElapsed + (x1+y1)/10;
+                r = (float) (((Math.sin(step / 50) + 0.75) * 170)/255);
+                g = (float) (((Math.sin(step / 50 + ((2 * Math.PI) / 3)) + 0.75) * 170)/255);
+                b = (float) (((Math.sin(step / 50 + ((4 * Math.PI) / 3)) + 0.75) * 170)/255);
+
+                if (r < 0) r = 0;
+                if (g < 0) g = 0;
+                if (b < 0) b = 0;
+                if (r > 1) r = 1;
+                if (g > 1) g = 1;
+                if (b > 1) b = 1;
+            } else {
+                r = (float) (color >> 16 & 255) / 255.0F;
+                g = (float) (color >> 8 & 255) / 255.0F;
+                b = (float) (color & 255) / 255.0F;
+            }
 
             Tessellator tessellator = Tessellator.getInstance();
             WorldRenderer worldrenderer = tessellator.getWorldRenderer();
@@ -122,7 +144,7 @@ public class ParticleHandler {
             GlStateManager.enableBlend();
             GlStateManager.disableTexture2D();
             GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-            GlStateManager.color(f, f1, f2, f3);
+            GlStateManager.color(r, g, b, a);
 
             worldrenderer.begin(7, DefaultVertexFormats.POSITION);
             worldrenderer.pos(ax, ay, 0.0D).endVertex();
@@ -137,7 +159,7 @@ public class ParticleHandler {
         }
     }
 
-    private static void drawRect(Double left, Double top, Double right, Double bottom, int color) {
+    private static void drawRect(Double left, Double top, Double right, Double bottom, int color, Boolean rainbow) {
         if (left < right) {
             Double i = left;
             left = right;
@@ -150,16 +172,33 @@ public class ParticleHandler {
             bottom = j;
         }
 
-        float f3 = (float)(color >> 24 & 255) / 255.0F;
-        float f = (float)(color >> 16 & 255) / 255.0F;
-        float f1 = (float)(color >> 8 & 255) / 255.0F;
-        float f2 = (float)(color & 255) / 255.0F;
+        float a = (float) (color >> 24 & 255) / 255.0f;
+        float r;
+        float g;
+        float b;
+        if (rainbow) {
+            double step = Main.ticksElapsed + (left+right)/10;
+            r = (float) (((Math.sin(step / 50) + 0.75) * 170)/255);
+            g = (float) (((Math.sin(step / 50 + ((2 * Math.PI) / 3)) + 0.75) * 170)/255);
+            b = (float) (((Math.sin(step / 50 + ((4 * Math.PI) / 3)) + 0.75) * 170)/255);
+
+            if (r < 0) r = 0;
+            if (g < 0) g = 0;
+            if (b < 0) b = 0;
+            if (r > 1) r = 1;
+            if (g > 1) g = 1;
+            if (b > 1) b = 1;
+        } else {
+            r = (float) (color >> 16 & 255) / 255.0F;
+            g = (float) (color >> 8 & 255) / 255.0F;
+            b = (float) (color & 255) / 255.0F;
+        }
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
         GlStateManager.enableBlend();
         GlStateManager.disableTexture2D();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-        GlStateManager.color(f, f1, f2, f3);
+        GlStateManager.color(r, g, b, a);
         worldrenderer.begin(7, DefaultVertexFormats.POSITION);
         worldrenderer.pos(left, bottom, 0.0D).endVertex();
         worldrenderer.pos(right, bottom, 0.0D).endVertex();

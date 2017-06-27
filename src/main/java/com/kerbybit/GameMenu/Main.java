@@ -12,10 +12,12 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Keyboard;
 
 @Mod(modid = "gm", name = "GameMenu", version = "0.9")
 public class Main {
+    public static int ticksElapsed = 0;
     public static Boolean openMenu = false;
     public static String dir = "./mods/GameMenu/";
     private KeyBinding openMenuKey;
@@ -46,6 +48,11 @@ public class Main {
     public void render(RenderGameOverlayEvent event) {
         MenuGUI.openGui();
         worldLoaded = true;
+    }
+
+    @SubscribeEvent
+    public void tick(TickEvent.ClientTickEvent event) {
+        ticksElapsed++;
     }
 
     @SubscribeEvent

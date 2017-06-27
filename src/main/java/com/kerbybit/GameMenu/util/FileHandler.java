@@ -67,13 +67,15 @@ public class FileHandler {
                 "           \"enabled\":true,\n" +
                 "           \"particle size\":2,\n" +
                 "           \"particle color\":{\n" +
+                "               \"rainbow\":true,\n" +
                 "               \"red\":255,\n" +
                 "               \"green\":255,\n" +
                 "               \"blue\":255\n" +
                 "           },\n" +
-                "           \"line thickness\":0.5,\n" +
+                "           \"line thickness\":1,\n" +
                 "           \"line max length\":50,\n" +
                 "           \"line color\":{\n" +
+                "               \"rainbow\":false,\n" +
                 "               \"red\":255,\n" +
                 "               \"green\":255,\n" +
                 "               \"blue\":255\n" +

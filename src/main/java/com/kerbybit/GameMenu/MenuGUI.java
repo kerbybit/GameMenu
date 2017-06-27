@@ -110,10 +110,12 @@ public class MenuGUI extends GuiScreen {
         ParticleHandler.lineSize = getFloat(menuJson, "settings.particles.line thickness", 0.25f, true);
         ParticleHandler.lineMaxLength = getFloat(menuJson, "settings.particles.line max length", 50);
 
+        ParticleHandler.partRainbow = FileHandler.getValue(menuJson, "settings.particles.particle color.rainbow").equals("true");
         ParticleHandler.partRed = getInt(menuJson, "settings.particles.particle color.red");
         ParticleHandler.partGreen = getInt(menuJson, "settings.particles.particle color.green");
         ParticleHandler.partBlue = getInt(menuJson, "settings.particles.particle color.blue");
 
+        ParticleHandler.lineRainbow = FileHandler.getValue(menuJson, "settings.particles.line color.rainbow").equals("true");
         ParticleHandler.lineRed = getInt(menuJson, "settings.particles.line color.red");
         ParticleHandler.lineGreen = getInt(menuJson, "settings.particles.line color.green");
         ParticleHandler.lineBlue = getInt(menuJson, "settings.particles.line color.blue");
