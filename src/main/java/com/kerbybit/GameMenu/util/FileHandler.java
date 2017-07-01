@@ -110,6 +110,12 @@ public class FileHandler {
                 "                   \"item\":\"fire_charge\"\n" +
                 "               }\n" +
                 "           },{\n" +
+                "               \"name\":\"BedWars\",\n" +
+                "               \"command\":\"bedwars\",\n" +
+                "               \"icon\":{\n" +
+                "                   \"item\":\"bed\"\n" +
+                "               }\n" +
+                "           },{\n" +
                 "               \"name\":\"Mega Walls\",\n" +
                 "               \"command\":\"mw\",\n" +
                 "               \"icon\":{\n" +
@@ -185,6 +191,12 @@ public class FileHandler {
                 "               \"command\":\"classic\",\n" +
                 "               \"icon\":{\n" +
                 "                   \"item\":\"jukebox\"\n" +
+                "               }\n" +
+                "           },{\n" +
+                "               \"name\":\"Murder\",\n" +
+                "               \"command\":\"ptl\",\n" +
+                "               \"icon\":{\n" +
+                "                   \"item\":\"compass\"\n" +
                 "               }\n" +
                 "           }\n" +
                 "       ]\n" +
