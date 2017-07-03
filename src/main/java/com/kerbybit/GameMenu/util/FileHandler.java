@@ -81,7 +81,9 @@ public class FileHandler {
                 "               \"blue\":255\n" +
                 "           }\n" +
                 "       },\n" +
-                "       \"animation speed\":5\n" +
+                "       \"animation speed\":5,\n" +
+                "       \"open with hypixel compass\":true,\n" +
+                "       \"check extra fast (may cause lag)\":true\n" +
                 "   },\n" +
                 "   \"top\":{\n" +
                 "       \"name\":\"&6Prototype Lobby\",\n" +

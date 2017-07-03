@@ -101,9 +101,14 @@ public class MenuGUI extends GuiScreen {
             CommandMenu.showMessage(EnumChatFormatting.RED + "Unable to load menu.json! Unknown Exception");
         }
 
+        String tempSettingString = FileHandler.getValue(menuJson, "settings.open with hypixel compass");
+        Main.openWithCompass = tempSettingString.equals("null") || tempSettingString.equals("true");
+        tempSettingString = FileHandler.getValue(menuJson, "settings.check extra fast (may cause lag)");
+        Main.checkFast = tempSettingString.equals("null") || tempSettingString.equals("true");
+
         animationSpeed = getFloat(menuJson, "settings.animation speed", 5);
 
-        String tempSettingString = FileHandler.getValue(menuJson, "settings.particles.enabled");
+        tempSettingString = FileHandler.getValue(menuJson, "settings.particles.enabled");
         ParticleHandler.enabled = tempSettingString.equals("null") || tempSettingString.equals("true");
 
         ParticleHandler.partSize = getFloat(menuJson, "settings.particles.particle size", 1, true);

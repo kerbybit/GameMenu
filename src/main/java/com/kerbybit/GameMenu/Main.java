@@ -1,7 +1,10 @@
 package com.kerbybit.GameMenu;
 
 import com.kerbybit.GameMenu.command.CommandMenu;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.inventory.ContainerChest;
+import net.minecraft.inventory.IInventory;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -17,11 +20,14 @@ import org.lwjgl.input.Keyboard;
 
 @Mod(modid = "gm", name = "GameMenu", version = "0.9")
 public class Main {
-    public static int ticksElapsed = 0;
+    static int ticksElapsed = 0;
     public static Boolean openMenu = false;
     public static String dir = "./mods/GameMenu/";
     private KeyBinding openMenuKey;
     public static Boolean worldLoaded = false;
+
+    public static Boolean openWithCompass = true;
+    public static Boolean checkFast = true;
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
@@ -48,11 +54,33 @@ public class Main {
     public void render(RenderGameOverlayEvent event) {
         MenuGUI.openGui();
         worldLoaded = true;
+
+        if (openWithCompass && checkFast) {
+            if (Minecraft.getMinecraft().thePlayer.openContainer instanceof ContainerChest) {
+                ContainerChest chest = (ContainerChest) Minecraft.getMinecraft().thePlayer.openContainer;
+                IInventory inv = chest.getLowerChestInventory();
+                if (inv.getName().equals("Game Menu")) {
+                    Minecraft.getMinecraft().thePlayer.closeScreen();
+                    openMenu = true;
+                }
+            }
+        }
     }
 
     @SubscribeEvent
     public void tick(TickEvent.ClientTickEvent event) {
         ticksElapsed++;
+
+        if (openWithCompass && !checkFast) {
+            if (Minecraft.getMinecraft().thePlayer.openContainer instanceof ContainerChest) {
+                ContainerChest chest = (ContainerChest) Minecraft.getMinecraft().thePlayer.openContainer;
+                IInventory inv = chest.getLowerChestInventory();
+                if (inv.getName().equals("Game Menu")) {
+                    Minecraft.getMinecraft().thePlayer.closeScreen();
+                    openMenu = true;
+                }
+            }
+        }
     }
 
     @SubscribeEvent
