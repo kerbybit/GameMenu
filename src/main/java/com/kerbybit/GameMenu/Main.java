@@ -23,11 +23,11 @@ public class Main {
     static int ticksElapsed = 0;
     public static Boolean openMenu = false;
     public static String dir = "./mods/GameMenu/";
-    private KeyBinding openMenuKey;
+    private static KeyBinding openMenuKey;
     public static Boolean worldLoaded = false;
 
-    public static Boolean openWithCompass = true;
-    public static Boolean checkFast = true;
+    static Boolean openWithCompass = true;
+    static Boolean checkFast = true;
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {

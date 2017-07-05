@@ -71,6 +71,9 @@ public class MenuGUI extends GuiScreen {
     private static String command_top;
     private static float color_right;
 
+    private static float color_top;
+    private static float color_bottom;
+
     public static void init() {
         left_texts.clear();
         left_commands.clear();
@@ -112,15 +115,20 @@ public class MenuGUI extends GuiScreen {
         ParticleHandler.enabled = tempSettingString.equals("null") || tempSettingString.equals("true");
 
         ParticleHandler.partSize = getFloat(menuJson, "settings.particles.particle size", 1, true);
+        ParticleHandler.partPack = getFloat(menuJson, "settings.particles.particle packing", 5);
         ParticleHandler.lineSize = getFloat(menuJson, "settings.particles.line thickness", 0.25f, true);
         ParticleHandler.lineMaxLength = getFloat(menuJson, "settings.particles.line max length", 50);
 
         ParticleHandler.partRainbow = FileHandler.getValue(menuJson, "settings.particles.particle color.rainbow").equals("true");
+        ParticleHandler.partRainbowSpeed = getFloat(menuJson, "settings.particles.particle color.rainbow speed", 50);
+        ParticleHandler.partRainbowStripes = getFloat(menuJson, "settings.particles.particle color.rainbow stripes", 10);
         ParticleHandler.partRed = getInt(menuJson, "settings.particles.particle color.red");
         ParticleHandler.partGreen = getInt(menuJson, "settings.particles.particle color.green");
         ParticleHandler.partBlue = getInt(menuJson, "settings.particles.particle color.blue");
 
         ParticleHandler.lineRainbow = FileHandler.getValue(menuJson, "settings.particles.line color.rainbow").equals("true");
+        ParticleHandler.lineRainbowSpeed = getFloat(menuJson, "settings.particles.line color.rainbow speed", 50);
+        ParticleHandler.lineRainbowStripes = getFloat(menuJson, "settings.particles.line color.rainbow stripes", 10);
         ParticleHandler.lineRed = getInt(menuJson, "settings.particles.line color.red");
         ParticleHandler.lineGreen = getInt(menuJson, "settings.particles.line color.green");
         ParticleHandler.lineBlue = getInt(menuJson, "settings.particles.line color.blue");
@@ -166,6 +174,28 @@ public class MenuGUI extends GuiScreen {
                 color_right = Integer.parseInt(temp_color_right.replaceFirst("#", ""), 16);
             } catch (Exception e) {
                 color_right = 0x001c03;
+            }
+        }
+
+        String temp_color_top;
+        if ((temp_color_top = FileHandler.getValue(menuJson, "top.color")).equals("null")) {
+            color_top = 0x000000;
+        } else {
+            try {
+               color_top = Integer.parseInt(temp_color_top.replaceFirst("#", ""), 16) ;
+            } catch (Exception e) {
+                color_top = 0x000000;
+            }
+        }
+
+        String temp_color_bottom;
+        if ((temp_color_bottom = FileHandler.getValue(menuJson, "bottom.color")).equals("null")) {
+            color_bottom = 0x000000;
+        } else {
+            try {
+                color_bottom = Integer.parseInt(temp_color_bottom.replaceFirst("#", ""), 16) ;
+            } catch (Exception e) {
+                color_bottom = 0x000000;
             }
         }
 
@@ -584,10 +614,10 @@ public class MenuGUI extends GuiScreen {
                 i++;
             }
 
-            drawRect(0, floor(height + offset_bottom), floor(width), floor(height), 0xff000000);
+            drawRect(0, floor(height + offset_bottom), floor(width), floor(height), (int) (color_bottom+0xff000000));
             drawCenteredString(ren, text_bottom, floor(width / 2), floor(height + offset_bottom/2)-3, 0xffffffff);
 
-            drawRect(0, floor(offset_top), floor(width), 0, 0xff000000);
+            drawRect(0, floor(offset_top), floor(width), 0, (int) (color_top+0xff000000));
             drawCenteredString(ren, text_top, floor(width/2), floor(offset_top/2 - 10)+5, 0xffffffff);
         }
 

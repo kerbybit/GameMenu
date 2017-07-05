@@ -18,11 +18,14 @@ public class ParticleHandler {
     private static List<Double> partsYspeed = new ArrayList<Double>();
 
     public static Boolean enabled = true;
-    static float partSize = 1f;
+    static float partSize = 1;
+    static float partPack = 5;
     static int partRed = 255;
     static int partGreen = 255;
     static int partBlue = 255;
     static Boolean partRainbow = false;
+    static float partRainbowStripes = 10;
+    static float partRainbowSpeed = 50;
 
     static float lineSize = 0.5f;
     static float lineMaxLength = 50;
@@ -30,6 +33,8 @@ public class ParticleHandler {
     static int lineGreen = 255;
     static int lineBlue = 255;
     static Boolean lineRainbow = false;
+    static float lineRainbowStripes = 10;
+    static float lineRainbowSpeed = 50;
 
     private static float width;
     private static float height;
@@ -47,7 +52,7 @@ public class ParticleHandler {
         height = res.getScaledHeight();
 
         if (enabled) {
-            for (int i = 0; i < (width + height) / 5; i++) {
+            for (int i = 0; i < (width + height) / partPack; i++) {
                 partsX.add(Math.random() * width);
                 partsY.add(Math.random() * height);
                 partsXspeed.add((Math.random() * 2 - 1) / 4);
@@ -78,6 +83,7 @@ public class ParticleHandler {
             partsY.set(i, (double) height);
     }
 
+    private static float sysTime = Minecraft.getSystemTime();
     static void draw(int menu, int x, int y) {
         if (menu == 0) {
             alpha = 255;
@@ -88,8 +94,15 @@ public class ParticleHandler {
                 alpha = 0;
         }
 
+        Boolean doStep = false;
+        if (Minecraft.getSystemTime() >= sysTime + 12L) {
+            sysTime = Minecraft.getSystemTime();
+            doStep = true;
+        }
+
         for (int i=0; i<partsX.size(); i++) {
-            step(i);
+            if (doStep)
+                step(i);
 
             drawLine(partsX.get(i), partsY.get(i), (double) x, (double) y, new Color(lineRed, lineGreen, lineBlue, alpha).getRGB(), lineRainbow);
             double size = partSize + partsYspeed.get(i);
@@ -121,10 +134,10 @@ public class ParticleHandler {
             float b;
 
             if (rainbow) {
-                double step = Main.ticksElapsed + (x1+y1)/10;
-                r = (float) (((Math.sin(step / 50) + 0.75) * 170)/255);
-                g = (float) (((Math.sin(step / 50 + ((2 * Math.PI) / 3)) + 0.75) * 170)/255);
-                b = (float) (((Math.sin(step / 50 + ((4 * Math.PI) / 3)) + 0.75) * 170)/255);
+                double step = Main.ticksElapsed + (x1+y1)/lineRainbowStripes;
+                r = (float) (((Math.sin(step / lineRainbowSpeed) + 0.75) * 170)/255);
+                g = (float) (((Math.sin(step / lineRainbowSpeed + ((2 * Math.PI) / 3)) + 0.75) * 170)/255);
+                b = (float) (((Math.sin(step / lineRainbowSpeed + ((4 * Math.PI) / 3)) + 0.75) * 170)/255);
 
                 if (r < 0) r = 0;
                 if (g < 0) g = 0;
@@ -177,10 +190,10 @@ public class ParticleHandler {
         float g;
         float b;
         if (rainbow) {
-            double step = Main.ticksElapsed + (left+right)/10;
-            r = (float) (((Math.sin(step / 50) + 0.75) * 170)/255);
-            g = (float) (((Math.sin(step / 50 + ((2 * Math.PI) / 3)) + 0.75) * 170)/255);
-            b = (float) (((Math.sin(step / 50 + ((4 * Math.PI) / 3)) + 0.75) * 170)/255);
+            double step = Main.ticksElapsed + (left+right)/partRainbowStripes;
+            r = (float) (((Math.sin(step / partRainbowSpeed) + 0.75) * 170)/255);
+            g = (float) (((Math.sin(step / partRainbowSpeed + ((2 * Math.PI) / 3)) + 0.75) * 170)/255);
+            b = (float) (((Math.sin(step / partRainbowSpeed + ((4 * Math.PI) / 3)) + 0.75) * 170)/255);
 
             if (r < 0) r = 0;
             if (g < 0) g = 0;

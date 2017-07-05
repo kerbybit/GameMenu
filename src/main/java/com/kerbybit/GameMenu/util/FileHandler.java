@@ -66,8 +66,11 @@ public class FileHandler {
                 "       \"particles\":{\n" +
                 "           \"enabled\":true,\n" +
                 "           \"particle size\":2,\n" +
+                "           \"particle packing\":5,\n" +
                 "           \"particle color\":{\n" +
                 "               \"rainbow\":true,\n" +
+                "               \"rainbow stripes\":10,\n" +
+                "               \"rainbow speed\":50,\n" +
                 "               \"red\":255,\n" +
                 "               \"green\":255,\n" +
                 "               \"blue\":255\n" +
@@ -76,6 +79,8 @@ public class FileHandler {
                 "           \"line max length\":50,\n" +
                 "           \"line color\":{\n" +
                 "               \"rainbow\":false,\n" +
+                "               \"rainbow stripes\":10,\n" +
+                "               \"rainbow speed\":50,\n" +
                 "               \"red\":255,\n" +
                 "               \"green\":255,\n" +
                 "               \"blue\":255\n" +
@@ -87,6 +92,7 @@ public class FileHandler {
                 "   },\n" +
                 "   \"top\":{\n" +
                 "       \"name\":\"&6Prototype Lobby\",\n" +
+                "       \"color\":\"#000000\",\n" +
                 "       \"command\":\"ptl\"\n" +
                 "   },\n" +
                 "   \"left\":{\n" +
@@ -205,6 +211,7 @@ public class FileHandler {
                 "   },\n" +
                 "   \"bottom\":{\n" +
                 "       \"name\":\"&cExit\",\n" +
+                "       \"color\":\"#000000\",\n" +
                 "       \"command\":\"*exit*\"\n" +
                 "   }\n" +
                 "}");
