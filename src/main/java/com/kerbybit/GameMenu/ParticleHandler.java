@@ -26,6 +26,8 @@ public class ParticleHandler {
     static Boolean partRainbow = false;
     static float partRainbowStripes = 10;
     static float partRainbowSpeed = 50;
+    static float partXSpeed = 4;
+    static float partYSpeed = 3;
 
     static float lineSize = 0.5f;
     static float lineMaxLength = 50;
@@ -55,8 +57,8 @@ public class ParticleHandler {
             for (int i = 0; i < (width + height) / partPack; i++) {
                 partsX.add(Math.random() * width);
                 partsY.add(Math.random() * height);
-                partsXspeed.add((Math.random() * 2 - 1) / 4);
-                partsYspeed.add((Math.random() / 2));
+                partsXspeed.add((Math.random() * 2 - 1) / partXSpeed);
+                partsYspeed.add((Math.random() / partYSpeed));
             }
         }
     }

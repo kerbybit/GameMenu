@@ -67,6 +67,8 @@ public class FileHandler {
                 "           \"enabled\":true,\n" +
                 "           \"particle size\":2,\n" +
                 "           \"particle packing\":5,\n" +
+                "           \"particle x speed\":4," +
+                "           \"particle y speed\":3," +
                 "           \"particle color\":{\n" +
                 "               \"rainbow\":true,\n" +
                 "               \"rainbow stripes\":10,\n" +
@@ -133,9 +135,8 @@ public class FileHandler {
                 "               \"name\":\"Crazy Walls\",\n" +
                 "               \"command\":\"crazywalls\",\n" +
                 "               \"icon\":{\n" +
-                "                   \"item\":\"skull\",\n" +
-                "                   \"meta\":3,\n" +
-                "                   \"owner\":\"kerbybit\"\n" +
+                "                   \"item\":\"stained_hardened_clay\",\n" +
+                "                   \"meta\":4\n" +
                 "               }\n" +
                 "           },{\n" +
                 "               \"name\":\"UHC Champions\",\n" +
@@ -172,9 +173,8 @@ public class FileHandler {
                 "               \"name\":\"Smash Heroes\",\n" +
                 "               \"command\":\"smash\",\n" +
                 "               \"icon\":{\n" +
-                "                   \"item\":\"skull\",\n" +
-                "                   \"meta\":3,\n" +
-                "                   \"owner\":\"spiderman\"\n" +
+                "                   \"item\":\"stained_hardened_clay\",\n" +
+                "                   \"meta\":14\n" +
                 "               }\n" +
                 "           },{\n" +
                 "               \"name\":\"TnT Games\",\n" +

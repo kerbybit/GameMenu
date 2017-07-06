@@ -116,6 +116,8 @@ public class MenuGUI extends GuiScreen {
 
         ParticleHandler.partSize = getFloat(menuJson, "settings.particles.particle size", 1, true);
         ParticleHandler.partPack = getFloat(menuJson, "settings.particles.particle packing", 5);
+        ParticleHandler.partXSpeed = getFloat(menuJson, "settings.particles.particle x speed", 4);
+        ParticleHandler.partYSpeed = getFloat(menuJson, "settings.particles.particle y speed", 3);
         ParticleHandler.lineSize = getFloat(menuJson, "settings.particles.line thickness", 0.25f, true);
         ParticleHandler.lineMaxLength = getFloat(menuJson, "settings.particles.line max length", 50);
 
