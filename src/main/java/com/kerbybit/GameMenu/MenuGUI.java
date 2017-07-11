@@ -120,6 +120,7 @@ public class MenuGUI extends GuiScreen {
         ParticleHandler.partYSpeed = getFloat(menuJson, "settings.particles.particle y speed", 3);
         ParticleHandler.lineSize = getFloat(menuJson, "settings.particles.line thickness", 0.25f, true);
         ParticleHandler.lineMaxLength = getFloat(menuJson, "settings.particles.line max length", 50);
+        ParticleHandler.lineType = getInt(menuJson, "settings.particles.line type", 0);
 
         ParticleHandler.partRainbow = FileHandler.getValue(menuJson, "settings.particles.particle color.rainbow").equals("true");
         ParticleHandler.partRainbowSpeed = getFloat(menuJson, "settings.particles.particle color.rainbow speed", 50);
@@ -277,15 +278,18 @@ public class MenuGUI extends GuiScreen {
     }
 
     private static int getInt(JsonObject menuJson, String key) {
+        return getInt(menuJson, key, 255);
+    }
+    private static int getInt(JsonObject menuJson, String key, int defaultValue) {
         String tempSettingString = FileHandler.getValue(menuJson, key);
         if (!tempSettingString.equals("null")) {
             try {
                 return Integer.parseInt(tempSettingString);
             } catch (NumberFormatException exception) {
-                return 255;
+                return defaultValue;
             }
         }
-        return 255;
+        return defaultValue;
     }
 
     private static float getFloat(JsonObject menuJson, String key, float defaultValue, Boolean getHalf) {

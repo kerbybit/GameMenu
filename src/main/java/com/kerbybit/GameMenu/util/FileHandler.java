@@ -67,8 +67,8 @@ public class FileHandler {
                 "           \"enabled\":true,\n" +
                 "           \"particle size\":2,\n" +
                 "           \"particle packing\":5,\n" +
-                "           \"particle x speed\":4," +
-                "           \"particle y speed\":3," +
+                "           \"particle x speed\":4,\n" +
+                "           \"particle y speed\":3,\n" +
                 "           \"particle color\":{\n" +
                 "               \"rainbow\":true,\n" +
                 "               \"rainbow stripes\":10,\n" +
@@ -79,6 +79,7 @@ public class FileHandler {
                 "           },\n" +
                 "           \"line thickness\":1,\n" +
                 "           \"line max length\":50,\n" +
+                "           \"line type\":0,\n" +
                 "           \"line color\":{\n" +
                 "               \"rainbow\":false,\n" +
                 "               \"rainbow stripes\":10,\n" +

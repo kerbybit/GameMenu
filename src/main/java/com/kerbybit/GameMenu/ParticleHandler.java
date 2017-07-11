@@ -29,6 +29,7 @@ public class ParticleHandler {
     static float partXSpeed = 4;
     static float partYSpeed = 3;
 
+    static int lineType = 0;
     static float lineSize = 0.5f;
     static float lineMaxLength = 50;
     static int lineRed = 255;
@@ -106,7 +107,20 @@ public class ParticleHandler {
             if (doStep)
                 step(i);
 
-            drawLine(partsX.get(i), partsY.get(i), (double) x, (double) y, new Color(lineRed, lineGreen, lineBlue, alpha).getRGB(), lineRainbow);
+            if (lineType == 1) {
+                for (int j = 0; j < partsX.size(); j++) {
+                    drawLine(partsX.get(i), partsY.get(i), partsX.get(j), partsY.get(j), new Color(lineRed, lineGreen, lineBlue, alpha).getRGB(), lineRainbow);
+                }
+            } else if (lineType == 2){
+                for (int j = 0; j < partsX.size(); j++) {
+                    drawLine(partsX.get(i), partsY.get(i), partsX.get(j), partsY.get(j), new Color(lineRed, lineGreen, lineBlue, alpha).getRGB(), lineRainbow);
+                }
+                drawLine(partsX.get(i), partsY.get(i), (double) x, (double) y, new Color(lineRed, lineGreen, lineBlue, alpha).getRGB(), lineRainbow);
+            } else {
+                drawLine(partsX.get(i), partsY.get(i), (double) x, (double) y, new Color(lineRed, lineGreen, lineBlue, alpha).getRGB(), lineRainbow);
+            }
+        }
+        for (int i=0; i<partsX.size(); i++) {
             double size = partSize + partsYspeed.get(i);
             drawRect(partsX.get(i) - size, partsY.get(i) - size, partsX.get(i) + size, partsY.get(i) + size, new Color(partRed, partGreen, partBlue, alpha).getRGB(), partRainbow);
         }
@@ -130,7 +144,7 @@ public class ParticleHandler {
             double cx = x2 - i;
             double cy = y2 - j;
 
-            float a = (float) (1 - (distance / lineMaxLength));
+            float a = ((color >> 24 & 255)/255.0F) - (float) (distance / lineMaxLength);
             float r;
             float g;
             float b;
